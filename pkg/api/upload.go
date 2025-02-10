@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/fmich7/fyle/types"
+	"github.com/fmich7/fyle/pkg/types"
 )
 
 // HandleFileUpload handles the file upload request
