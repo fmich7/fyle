@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/fmich7/fyle/types"
+	"github.com/fmich7/fyle/pkg/types"
 )
 
 type DiskStorage struct {

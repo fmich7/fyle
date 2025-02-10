@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/fmich7/fyle/storage"
+	"github.com/fmich7/fyle/internal/storage"
 )
 
 type Server struct {
