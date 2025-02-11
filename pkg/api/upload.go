@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -14,13 +15,15 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 
 	// Get user and location from the request
 	// TODO: AUTH CHECK
-	if !r.Form.Has("user") {
-		http.Error(w, "Missing user", http.StatusBadRequest)
+
+	user := r.FormValue("user")
+	if user == "" {
+		http.Error(w, "User not provided", http.StatusBadRequest)
 		return
 	}
-	user := r.FormValue("user")
 	location := r.FormValue("location")
 
+	fmt.Println(user, location)
 	// Retrieve the file from the request
 	fileData, header, err := r.FormFile("file")
 	if err != nil {
@@ -38,5 +41,5 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 
 	// Return a 201 Created status
 	w.WriteHeader(http.StatusCreated)
-	log.Println("File uploaded successfully: ", file.Filename)
+	log.Println("File uploaded successfully:", file.Owner, file.Filename)
 }

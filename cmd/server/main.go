@@ -10,7 +10,7 @@ import (
 
 func main() {
 	PORT := ":3000"
-	store := storage.NewDiskStorage("../../uploads")
+	store := storage.NewDiskStorage("uploads")
 
 	server := api.NewServer(PORT, store)
 
