@@ -10,10 +10,13 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "fyle",
 	Short: "fyle is a cli tool for managing your files on the cloud",
-	Run: func(cmd *cobra.Command, args []string) {
-
-	},
 }
+
+const (
+	uploadURL = "http://localhost:3000/upload"
+	user      = "fmich7"
+	location  = "folder"
+)
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
