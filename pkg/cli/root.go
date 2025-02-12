@@ -12,10 +12,11 @@ var rootCmd = &cobra.Command{
 	Short: "fyle is a cli tool for managing your files on the cloud",
 }
 
-const (
-	uploadURL = "http://localhost:3000/upload"
-	user      = "fmich7"
-	location  = "folder"
+// TODO: CONFIG!!!!!
+var (
+	UploadURL = "http://localhost:3000/upload"
+	User      = "fmich7"
+	Location  = "folder"
 )
 
 func Execute() {

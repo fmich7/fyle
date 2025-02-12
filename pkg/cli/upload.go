@@ -8,19 +8,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
 // UploadFile uploads a file to the server
 func UploadFile(path string) error {
-	absPath, err := utils.GetAbsolutePath(path)
-	if err != nil {
-		return err
-	}
-
-	// Open file
-	file, err := os.Open(absPath)
+	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("Error opening file: %s", err)
 	}
@@ -31,15 +24,15 @@ func UploadFile(path string) error {
 	writer := multipart.NewWriter(body)
 	defer writer.Close()
 
-	if err := writer.WriteField("user", user); err != nil {
+	if err := writer.WriteField("user", User); err != nil {
 		return err
 	}
-	if err := writer.WriteField("location", location); err != nil {
+	if err := writer.WriteField("location", Location); err != nil {
 		return err
 	}
 
 	// Create form
-	part, err := writer.CreateFormFile("file", absPath)
+	part, err := writer.CreateFormFile("file", path)
 	if err != nil {
 		return fmt.Errorf("Error creating form: %s", err)
 	}
@@ -52,7 +45,7 @@ func UploadFile(path string) error {
 	writer.Close()
 
 	// Create request and set headers
-	resp, err := http.Post(uploadURL, writer.FormDataContentType(), body)
+	resp, err := http.Post(UploadURL, writer.FormDataContentType(), body)
 	if err != nil {
 		return fmt.Errorf("Error creating request: %s", err)
 	}
