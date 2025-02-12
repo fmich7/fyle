@@ -3,15 +3,15 @@ package api
 import (
 	"net/http"
 
-	"github.com/fmich7/fyle/pkg/storage"
+	"github.com/fmich7/fyle/pkg/types"
 )
 
 type Server struct {
 	listenAddr string
-	store      storage.Storage
+	store      types.Storage
 }
 
-func NewServer(listenAddr string, store storage.Storage) *Server {
+func NewServer(listenAddr string, store types.Storage) *Server {
 	return &Server{
 		listenAddr: listenAddr,
 		store:      store,
