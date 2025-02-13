@@ -16,7 +16,6 @@ var rootCmd = &cobra.Command{
 var (
 	UploadURL = "http://localhost:3000/upload"
 	User      = "fmich7"
-	Location  = "folder"
 )
 
 func Execute() {
