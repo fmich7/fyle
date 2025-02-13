@@ -9,7 +9,7 @@ import (
 )
 
 func TestExecute(t *testing.T) {
-	// Create a pipe to retransfer the output
+	// Pipe to redirect stderr
 	r, w, _ := os.Pipe()
 	oldStderr := os.Stderr
 	os.Stderr = w
@@ -21,7 +21,7 @@ func TestExecute(t *testing.T) {
 	// Test function
 	cli.Execute()
 
-	// Close the write end of the pipe and read the output
+	// Close the write end of the pipe and read output
 	w.Close()
 
 	var buf bytes.Buffer

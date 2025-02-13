@@ -33,6 +33,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer fileData.Close()
 
+	// Check if the location is valid
 	userInputPath := r.FormValue("location")
 	safePath, valid := utils.LocationOnServer(
 		s.store.GetFileUploadsLocation(),
@@ -47,7 +48,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create a new file object and upload it
+	// Create new file object and upload it
 	file := types.NewFile(header, fileData, user, safePath)
 	if err := s.store.UploadFile(file); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -55,7 +56,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return a 201 Created status
+	// Return 201 Created status
 	w.WriteHeader(http.StatusCreated)
 	log.Println("File uploaded successfully:", file.Owner, file.Filename)
 }

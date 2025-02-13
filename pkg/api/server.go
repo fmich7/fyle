@@ -11,6 +11,7 @@ type Server struct {
 	store      types.Storage
 }
 
+// NewServer creates a new instance of the Server struct
 func NewServer(listenAddr string, store types.Storage) *Server {
 	return &Server{
 		listenAddr: listenAddr,
@@ -18,6 +19,7 @@ func NewServer(listenAddr string, store types.Storage) *Server {
 	}
 }
 
+// Start starts the server
 func (s *Server) Start() error {
 	http.HandleFunc("POST /upload", s.HandleFileUpload)
 
