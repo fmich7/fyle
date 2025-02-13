@@ -47,8 +47,7 @@ func (d *DiskStorage) DownloadFile(path string) error {
 
 // createFile creates a file in the disk storage
 func (d *DiskStorage) createFile(file *types.File) (*os.File, error) {
-	path := d.location + "/" + file.Owner + "/" + file.Location + "/" + file.Filename
-	dirPath := filepath.Dir(path)
+	dirPath := filepath.Dir(file.Location)
 
 	// Check if the directory exists, and create it if it doesn't
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
@@ -59,10 +58,14 @@ func (d *DiskStorage) createFile(file *types.File) (*os.File, error) {
 	}
 
 	// Create the file
-	dst, err := os.Create(path)
+	dst, err := os.Create(file.Location)
 	if err != nil {
 		return nil, err
 	}
 
 	return dst, nil
+}
+
+func (d *DiskStorage) GetFileUploadsLocation() string {
+	return d.location
 }

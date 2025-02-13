@@ -52,7 +52,7 @@ func TestUploadFile(t *testing.T) {
 	cli.UploadURL = server.URL
 
 	// Call UploadFile
-	err = cli.UploadFile(tempFile.Name())
+	err = cli.UploadFile(tempFile.Name(), "testLocation")
 
 	// Assert no error
 	assert.NoError(t, err, "Expected no error from UploadFile")

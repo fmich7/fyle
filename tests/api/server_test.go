@@ -19,7 +19,7 @@ func TestHandleFileUpload(t *testing.T) {
 
 	// Add user and location form fields
 	_ = writer.WriteField("user", "testUser")
-	_ = writer.WriteField("location", "testLocation")
+	_ = writer.WriteField("location", ".")
 
 	// Create a temporary file field
 	fileWriter, err := writer.CreateFormFile("file", "testfile.txt")
@@ -40,7 +40,9 @@ func TestHandleFileUpload(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	// Create a mock server instance with a mock store
-	mockServer := api.NewServer(":0", &utils.MockStore{})
+	storage := utils.NewMockStorage("uploads")
+	mockServer := api.NewServer(":0", storage)
+	defer storage.Cleanup()
 
 	// Call the handler
 	mockServer.HandleFileUpload(recorder, req)

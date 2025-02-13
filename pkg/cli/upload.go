@@ -11,9 +11,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var uploadCmd = &cobra.Command{
+	Use: "upload",
+	Short: "Uploads a file to server\n" +
+		"As of now, only single file upload is supported\n" +
+		"Usage: fyle upload <file-path>",
+	Args: cobra.MinimumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		filepath := args[0]
+		destinationPath := "."
+		if len(args) > 1 {
+			destinationPath = args[1]
+		}
+
+		UploadFile(filepath, destinationPath)
+	},
+}
+
 // UploadFile uploads a file to the server
-func UploadFile(path string) error {
-	file, err := os.Open(path)
+func UploadFile(filepath, location string) error {
+	file, err := os.Open(filepath)
 	if err != nil {
 		return fmt.Errorf("Error opening file: %s", err)
 	}
@@ -27,12 +44,12 @@ func UploadFile(path string) error {
 	if err := writer.WriteField("user", User); err != nil {
 		return err
 	}
-	if err := writer.WriteField("location", Location); err != nil {
+	if err := writer.WriteField("location", location); err != nil {
 		return err
 	}
 
 	// Create form
-	part, err := writer.CreateFormFile("file", path)
+	part, err := writer.CreateFormFile("file", filepath)
 	if err != nil {
 		return fmt.Errorf("Error creating form: %s", err)
 	}
@@ -61,18 +78,6 @@ func UploadFile(path string) error {
 	fmt.Println("Server Response:", string(respBody))
 
 	return nil
-}
-
-// TODO: Add multiple file upload support
-var uploadCmd = &cobra.Command{
-	Use: "upload",
-	Short: "Uploads a file to server\n" +
-		"As of now, only single file upload is supported\n" +
-		"Usage: fyle upload <file-path>",
-	Args: cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		UploadFile(args[0])
-	},
 }
 
 func init() {
