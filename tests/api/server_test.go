@@ -13,7 +13,7 @@ import (
 )
 
 func TestHandleFileUpload(t *testing.T) {
-	// Create a new multipart form writer
+	// Create multipart form writer
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
 
@@ -21,7 +21,7 @@ func TestHandleFileUpload(t *testing.T) {
 	_ = writer.WriteField("user", "testUser")
 	_ = writer.WriteField("location", ".")
 
-	// Create a temporary file field
+	// Create temporary file field
 	fileWriter, err := writer.CreateFormFile("file", "testfile.txt")
 	assert.NoError(t, err, "Failed to create form file")
 
@@ -32,21 +32,21 @@ func TestHandleFileUpload(t *testing.T) {
 	err = writer.Close()
 	assert.NoError(t, err, "Failed to close multipart writer")
 
-	// Create a new HTTP request
+	// Create HTTP request
 	req := httptest.NewRequest(http.MethodPost, "/upload", &requestBody)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
-	// Create a response recorder
+	// Create response recorder
 	recorder := httptest.NewRecorder()
 
-	// Create a mock server instance with a mock store
+	// Create mock server instance with a mock store
 	storage := utils.NewMockStorage("uploads")
 	mockServer := api.NewServer(":0", storage)
 	defer storage.Cleanup()
 
-	// Call the handler
+	// Call handler
 	mockServer.HandleFileUpload(recorder, req)
 
-	// Check the response
+	// Check response
 	assert.Equal(t, http.StatusCreated, recorder.Code, "Expected HTTP 201 Created")
 }

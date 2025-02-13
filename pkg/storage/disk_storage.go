@@ -41,6 +41,7 @@ func (d *DiskStorage) UploadFile(file *types.File) error {
 	return nil
 }
 
+// DownloadFile downloads a file from the disk storage
 func (d *DiskStorage) DownloadFile(path string) error {
 	return nil
 }
@@ -66,6 +67,7 @@ func (d *DiskStorage) createFile(file *types.File) (*os.File, error) {
 	return dst, nil
 }
 
+// GetFileUploadsLocation returns the file uploads location
 func (d *DiskStorage) GetFileUploadsLocation() string {
 	return d.location
 }

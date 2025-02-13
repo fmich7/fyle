@@ -11,7 +11,7 @@ make build
 ./bin/fyle-server
 ```
 
-2. ❗This is temporary solution❗
+2. ❗This is a temporary solution❗
 
 - Set alias in your shell
   ```bash

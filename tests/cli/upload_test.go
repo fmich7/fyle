@@ -29,7 +29,7 @@ func TestUploadFile(t *testing.T) {
 
 	fmt.Println("Temp file path:", tempFile.Name()) // Debugging
 
-	// Mock HTTP server
+	// Mock server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Verify method
 		assert.Equal(t, http.MethodPost, r.Method, "Expected POST request")
@@ -51,9 +51,8 @@ func TestUploadFile(t *testing.T) {
 	// Set mock upload URL
 	cli.UploadURL = server.URL
 
-	// Call UploadFile
+	// Test UploadFile
 	err = cli.UploadFile(tempFile.Name(), "testLocation")
 
-	// Assert no error
 	assert.NoError(t, err, "Expected no error from UploadFile")
 }

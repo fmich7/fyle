@@ -18,6 +18,7 @@ var (
 	User      = "fmich7"
 )
 
+// Execute runs the root command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error on executing cli: %s\n", err)
