@@ -2,6 +2,7 @@ package utils
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/fmich7/fyle/pkg/types"
 )
@@ -32,15 +33,13 @@ func NewMockStorage(fileUploadsLocation string) *MockStore {
 		os.Mkdir(fileUploadsLocation, os.ModePerm)
 	}
 
-	return &MockStore{
-		location: fileUploadsLocation,
-	}
-}
-
-// Remove all files and directories from mockup db location
-func (m *MockStore) Cleanup() {
-	err := os.RemoveAll(m.location)
+	// Get the absolute path of the file uploads location
+	rootStoragePath, err := filepath.Abs(fileUploadsLocation)
 	if err != nil {
 		panic(err)
+	}
+
+	return &MockStore{
+		location: rootStoragePath,
 	}
 }
