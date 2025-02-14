@@ -6,6 +6,7 @@ import (
 	"github.com/fmich7/fyle/pkg/types"
 )
 
+// Server is a struct that represents the server
 type Server struct {
 	listenAddr string
 	store      types.Storage

@@ -9,6 +9,8 @@ import (
 	"github.com/fmich7/fyle/pkg/types"
 )
 
+// DiskStorage is a struct that implements the Storage interface
+// It is used to store files on disk
 type DiskStorage struct {
 	location string
 }
@@ -20,20 +22,28 @@ func NewDiskStorage(fileUploadsLocation string) *DiskStorage {
 		os.Mkdir(fileUploadsLocation, os.ModePerm)
 	}
 
+	// Get the absolute path of the file uploads location
+	rootStoragePath, err := filepath.Abs(fileUploadsLocation)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println("Root storage path:", rootStoragePath)
 	return &DiskStorage{
-		location: fileUploadsLocation,
+		location: rootStoragePath,
 	}
 }
 
 // UploadFile creates a file in the disk storage
 func (d *DiskStorage) UploadFile(file *types.File) error {
-	// create file in disk storage
+	// Create file in disk storage
 	dst, err := d.createFile(file)
 	if err != nil {
 		return errors.New("Error creating file")
 	}
 	defer dst.Close()
-	// write the file to disk
+
+	// Write the file to disk
 	if _, err := dst.ReadFrom(file.Data); err != nil {
 		return errors.New("Error writing file to disk")
 	}
@@ -47,6 +57,7 @@ func (d *DiskStorage) DownloadFile(path string) error {
 }
 
 // createFile creates a file in the disk storage
+// It creates the directory if it doesn't exist
 func (d *DiskStorage) createFile(file *types.File) (*os.File, error) {
 	dirPath := filepath.Dir(file.Location)
 

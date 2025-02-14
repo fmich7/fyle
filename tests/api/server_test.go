@@ -42,7 +42,6 @@ func TestHandleFileUpload(t *testing.T) {
 	// Create mock server instance with a mock store
 	storage := utils.NewMockStorage("uploads")
 	mockServer := api.NewServer(":0", storage)
-	defer storage.Cleanup()
 
 	// Call handler
 	mockServer.HandleFileUpload(recorder, req)

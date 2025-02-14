@@ -1,60 +1,27 @@
 package utils
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 )
 
-// GetAbsolutePath returns the absolute path of a file
-func GetAbsolutePath(path string) (string, error) {
-	// Get working directory
-	wd, err := os.Getwd()
-	if err != nil {
-		return "", fmt.Errorf("Error getting working directory: %s", err)
-	}
+// GetLocationOnServer return joined file location on the server
+// Also it checks if the path is not outside user folder
+func GetLocationOnServer(storageRootAbsPath, username, subfolders, filename string) (string, bool) {
+	// User home dir
+	userDir := filepath.Join(storageRootAbsPath, username)
 
-	// Join path
-	absPath, err := filepath.Abs(filepath.Join(wd, path))
-	if err != nil {
-		return "", fmt.Errorf("Error getting absolute path: %s", err)
-	}
-
-	return absPath, nil
-}
-
-// LocationOnServer checks if the location is on the server is valid
-// Returns the correct location if using shorthand
-func LocationOnServer(baseDir, user, location, filename string) (string, bool) {
-	// Reject unsafe usernames
-	user = filepath.Clean(user)
-	if user == ".." || strings.Contains(user, "/") || strings.Contains(user, "\\") {
-		return "", false //
-	}
-
-	// Ensure user directory is set correctly
-	userDir, err := filepath.Abs(filepath.Join(baseDir, user))
-	if err != nil {
-		return "", false
-	}
-
-	// Create user directory if it doesn't exist
-	if _, err := os.Stat(userDir); os.IsNotExist(err) {
-		os.Mkdir(userDir, os.ModePerm)
-	}
-
-	// Handle location shorthands (`~/`, `.`, `/`) → Defaults to user directory
-	homeShorthands := []string{"~", "~/.", ".", "./", "/"}
-	for _, shorthand := range homeShorthands {
-		if location == shorthand {
-			location = ""
+	// Handle home shortcuts -> defaults to user directory
+	homeShortcuts := []string{"~", "~/.", ".", "./", "/"}
+	for _, shorthand := range homeShortcuts {
+		if subfolders == shorthand {
+			subfolders = ""
 			break
 		}
 	}
 
-	// Join user directory with location and filename
-	fullPath := filepath.Join(userDir, location, filename)
+	// Join user directory with subfolders and filename
+	fullPath := filepath.Join(userDir, subfolders, filename)
 
 	// Normalize path
 	absPath, err := filepath.Abs(fullPath)
@@ -62,7 +29,7 @@ func LocationOnServer(baseDir, user, location, filename string) (string, bool) {
 		return "", false
 	}
 
-	// Ensure the resolved path is still within userDir (prevent directory traversal)
+	// Prevent directory traversal attacks
 	if !strings.HasPrefix(absPath, userDir) {
 		return "", false
 	}

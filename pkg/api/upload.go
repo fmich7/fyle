@@ -14,9 +14,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	log.Println("Uploading file")
 	r.ParseMultipartForm(10 << 20) // 10 MB max size
 
-	// Get user and location from the request
-	// TODO: AUTH CHECK
-
+	// Get user from the request
 	user := r.FormValue("user")
 	if user == "" {
 		http.Error(w, "User not provided", http.StatusBadRequest)
@@ -33,9 +31,10 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer fileData.Close()
 
-	// Check if the location is valid
+	// Get target location from the request
+	// Check if it is valid
 	userInputPath := r.FormValue("location")
-	safePath, valid := utils.LocationOnServer(
+	safePath, valid := utils.GetLocationOnServer(
 		s.store.GetFileUploadsLocation(),
 		user,
 		userInputPath,
@@ -48,7 +47,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create new file object and upload it
+	// Create new file object and upload it to the storage
 	file := types.NewFile(header, fileData, user, safePath)
 	if err := s.store.UploadFile(file); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
