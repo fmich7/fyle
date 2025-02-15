@@ -22,6 +22,8 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userInputPath := r.FormValue("path")
+
 	// Retrieve the file from the request
 	fileData, header, err := r.FormFile("file")
 	if err != nil {
@@ -31,15 +33,14 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer fileData.Close()
 
-	// Get target location from the request
-	// Check if it is valid
-	userInputPath := r.FormValue("location")
+	// Check if requested path is valid
 	safePath, valid := utils.GetLocationOnServer(
 		s.store.GetFileUploadsLocation(),
 		user,
 		userInputPath,
 		header.Filename,
 	)
+	log.Println(safePath, userInputPath, user, header.Filename)
 
 	if !valid {
 		http.Error(w, "Invalid location", http.StatusBadRequest)
@@ -49,7 +50,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 
 	// Create new file object and upload it to the storage
 	file := types.NewFile(header, fileData, user, safePath)
-	if err := s.store.UploadFile(file); err != nil {
+	if err := s.store.StoreFile(file); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		fmt.Println("Error uploading file:", err)
 		return

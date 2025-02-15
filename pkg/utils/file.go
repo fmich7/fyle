@@ -1,9 +1,44 @@
 package utils
 
 import (
+	"bytes"
 	"path/filepath"
 	"strings"
 )
+
+// Replaces aliases that user might use as a home dir
+func ReplaceHomeDirAliases(path string) string {
+	res := path
+	// Handle home shortcuts -> defaults to user directory
+	homeShortcuts := []string{"~", "~/.", ".", "./", "/", "home"}
+	for _, shorthand := range homeShortcuts {
+		if res == shorthand {
+			return ""
+		}
+	}
+
+	return res
+}
+
+// Checks if constructed path corresponds to a file stored in storageRootPath
+func validateAndJoinParts(storageRootPath string, parts ...string) (string, bool) {
+	buf := &bytes.Buffer{}
+	buf.WriteString(storageRootPath)
+	for _, part := range parts {
+		// Idk if i should do this together
+		buf.WriteString("/")
+		buf.WriteString(part)
+	}
+
+	joinedPath := filepath.Clean(string(buf.Bytes()))
+
+	// Prevent directory traversal attacks
+	if !strings.HasPrefix(joinedPath, storageRootPath) {
+		return "", false
+	}
+
+	return joinedPath, true
+}
 
 // GetLocationOnServer return joined file location on the server
 // Also it checks if the path is not outside user folder
@@ -11,28 +46,18 @@ func GetLocationOnServer(storageRootAbsPath, username, subfolders, filename stri
 	// User home dir
 	userDir := filepath.Join(storageRootAbsPath, username)
 
-	// Handle home shortcuts -> defaults to user directory
-	homeShortcuts := []string{"~", "~/.", ".", "./", "/"}
-	for _, shorthand := range homeShortcuts {
-		if subfolders == shorthand {
-			subfolders = ""
-			break
-		}
-	}
+	// Replace aliases if they were provided
+	subfolders = ReplaceHomeDirAliases(subfolders)
 
-	// Join user directory with subfolders and filename
-	fullPath := filepath.Join(userDir, subfolders, filename)
-
-	// Normalize path
-	absPath, err := filepath.Abs(fullPath)
-	if err != nil {
+	fullPath, valid := validateAndJoinParts(userDir, subfolders, filename)
+	if !valid {
 		return "", false
 	}
 
-	// Prevent directory traversal attacks
-	if !strings.HasPrefix(absPath, userDir) {
-		return "", false
-	}
+	return fullPath, true
+}
 
-	return absPath, true
+// GetFileNameFromPath return filename with extension from given path
+func GetFileNameFromPath(path string) string {
+	return filepath.Base(path)
 }

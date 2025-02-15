@@ -1,8 +1,10 @@
 package types
 
+import "io"
+
 // Storage represents a storage interface for server
 type Storage interface {
-	UploadFile(file *File) error
-	DownloadFile(path string) error
+	StoreFile(file *File) error
+	RetrieveFile(path string) (io.ReadCloser, error)
 	GetFileUploadsLocation() string
 }
