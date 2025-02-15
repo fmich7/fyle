@@ -2,6 +2,7 @@ package storage
 
 import (
 	"errors"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -35,7 +36,7 @@ func NewDiskStorage(fileUploadsLocation string) *DiskStorage {
 }
 
 // UploadFile creates a file in the disk storage
-func (d *DiskStorage) UploadFile(file *types.File) error {
+func (d *DiskStorage) StoreFile(file *types.File) error {
 	// Create file in disk storage
 	dst, err := d.createFile(file)
 	if err != nil {
@@ -51,9 +52,13 @@ func (d *DiskStorage) UploadFile(file *types.File) error {
 	return nil
 }
 
-// DownloadFile downloads a file from the disk storage
-func (d *DiskStorage) DownloadFile(path string) error {
-	return nil
+// RetrieveFile returns io.ReaderCloser of stored file
+func (d *DiskStorage) RetrieveFile(path string) (io.ReadCloser, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	return file, err
 }
 
 // createFile creates a file in the disk storage

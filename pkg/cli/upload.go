@@ -11,20 +11,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// path on server
+// filepath - file on disk
 var uploadCmd = &cobra.Command{
 	Use: "upload",
 	Short: "Uploads a file to server\n" +
 		"As of now, only single file upload is supported\n" +
-		"Usage: fyle upload <file-path>",
+		"Usage: fyle upload <path>",
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		filepath := args[0]
-		destinationPath := "."
+		path := "."
 		if len(args) > 1 {
-			destinationPath = args[1]
+			path = args[1]
 		}
 
-		UploadFile(filepath, destinationPath)
+		UploadFile(filepath, path)
 	},
 }
 
@@ -44,7 +46,7 @@ func UploadFile(filepath, location string) error {
 	if err := writer.WriteField("user", User); err != nil {
 		return err
 	}
-	if err := writer.WriteField("location", location); err != nil {
+	if err := writer.WriteField("path", location); err != nil {
 		return err
 	}
 
