@@ -1,0 +1,62 @@
+package api
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/utils"
+)
+
+// HandleFileUpload handles the file upload request
+func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
+	log.Println("Uploading file")
+	r.ParseMultipartForm(10 << 20) // 10 MB max size
+
+	// Get user from the request
+	user := r.FormValue("user")
+	if user == "" {
+		http.Error(w, "User not provided", http.StatusBadRequest)
+		fmt.Println("User not provided")
+		return
+	}
+
+	userInputPath := r.FormValue("path")
+
+	// Retrieve the file from the request
+	fileData, header, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, "Error retrieving file", http.StatusBadRequest)
+		fmt.Println("Error retrieving file")
+		return
+	}
+	defer fileData.Close()
+
+	// Check if requested path is valid
+	safePath, valid := utils.GetLocationOnServer(
+		s.store.GetFileUploadsLocation(),
+		user,
+		userInputPath,
+		header.Filename,
+	)
+	log.Println(safePath, userInputPath, user, header.Filename)
+
+	if !valid {
+		http.Error(w, "Invalid location", http.StatusBadRequest)
+		fmt.Println(safePath, userInputPath, user, s.store.GetFileUploadsLocation(), header.Filename)
+		return
+	}
+
+	// Create new file object and upload it to the storage
+	file := types.NewFile(header, fileData, user, safePath)
+	if err := s.store.StoreFile(file); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		fmt.Println("Error uploading file:", err)
+		return
+	}
+
+	// Return 201 Created status
+	w.WriteHeader(http.StatusCreated)
+	log.Println("File uploaded successfully:", file.Owner, file.Filename)
+}
