@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -14,8 +15,10 @@ var rootCmd = &cobra.Command{
 
 // TODO: CONFIG!!!!!
 var (
-	UploadURL = "http://localhost:3000/upload"
-	User      = "fmich7"
+	UploadURL          = "http://localhost:3000/upload"
+	DownloadURL        = "http://localhost:3000/download"
+	User               = "fmich7"
+	RequestTimeoutTime = 10 * time.Second
 )
 
 // Execute runs the root command

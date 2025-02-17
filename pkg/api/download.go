@@ -1,11 +1,13 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 
+	"github.com/fmich7/fyle/pkg/types"
 	"github.com/fmich7/fyle/pkg/utils"
 )
 
@@ -14,29 +16,24 @@ func (s *Server) HandleFileDownload(w http.ResponseWriter, r *http.Request) {
 	log.Println("Downloading file")
 
 	// TODO: Auth check
-
-	// Get user from the request
-	user := r.FormValue("user")
-	if user == "" {
-		http.Error(w, "User not provided", http.StatusBadRequest)
-		return
-	}
+	// GET USER FROM AUTH-HEADER!!!!!!!!!!!1
+	user := "fmich7"
 
 	// Get file path from the request
-	path := r.FormValue("path")
-	if path == "" {
-		http.Error(w, "Path not provided", http.StatusBadRequest)
+	var reqBody types.DownloadRequest
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		http.Error(w, "Error decoding request body", http.StatusBadRequest)
 		return
 	}
 
 	// Get filename from valid path
-	filename := utils.GetFileNameFromPath(path)
+	filename := utils.GetFileNameFromPath(reqBody.Path)
 
 	// Check if file exists on a server
 	path, valid := utils.GetLocationOnServer(
 		s.store.GetFileUploadsLocation(),
 		user,
-		path,
+		reqBody.Path,
 		"", // path should already contain a filename
 	)
 
