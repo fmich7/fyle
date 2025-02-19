@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// GetBaseDir returns absolute path without filename
+// GetBaseDir returns absolute path without filename (parent folder)
 func GetBaseDir(path string) (string, error) {
 	absPath, err := filepath.Abs(path)
 	fmt.Println(absPath)
@@ -19,6 +19,10 @@ func GetBaseDir(path string) (string, error) {
 
 	info, err := os.Stat(absPath)
 	if err != nil {
+		// If the path doesn't exist, return its parent directory
+		if os.IsNotExist(err) {
+			return filepath.Dir(absPath), nil
+		}
 		return "", err
 	}
 
@@ -31,35 +35,32 @@ func GetBaseDir(path string) (string, error) {
 
 // Replaces aliases that user might use as a home dir
 func ReplaceHomeDirAliases(path string) string {
-	res := path
 	// Handle home shortcuts -> defaults to user directory
-	homeShortcuts := []string{"~", "~/.", ".", "./", "/", "home"}
+	homeShortcuts := []string{"~", "home", "./"}
 	for _, shorthand := range homeShortcuts {
-		if res == shorthand {
-			return ""
-		}
+		path = strings.TrimPrefix(path, shorthand)
 	}
 
-	return res
+	return path
 }
 
+// JoinPathParts joins path parts with starting path
 func JoinPathParts(storageRootPath string, parts ...string) string {
-	buf := new(bytes.Buffer)
-	buf.WriteString(storageRootPath)
-	for _, part := range parts {
-		// Idk if i should do this together
-		buf.WriteString("/")
-		buf.WriteString(part)
-	}
+	// Join parts
+	joinedParts := filepath.Join(parts...)
 
-	joinedPath := filepath.Clean(string(buf.Bytes()))
-	return joinedPath
+	// Join storage root path with joined parts
+	finalPath := filepath.Join(storageRootPath, joinedParts)
+
+	return filepath.Clean(finalPath)
 }
 
 // ValidatePath check if constructedPath isn't "higher" than rootPath
 func ValidatePath(storageRootPath, constructedPath string) bool {
+	path := filepath.Clean(constructedPath)
+
 	// Prevent directory traversal attacks
-	if !strings.HasPrefix(constructedPath, storageRootPath) {
+	if !strings.HasPrefix(path, storageRootPath) {
 		return false
 	}
 
@@ -86,41 +87,64 @@ func GetLocationOnServer(storageRootAbsPath, username, subfolders, filename stri
 
 // GetFileNameFromPath return filename with extension from given path
 func GetFileNameFromPath(path string) string {
+	// Windows paths to Unix style
+	path = strings.ReplaceAll(path, "\\", "/")
+
+	// is dir
+	if path == "" || path[len(path)-1] == os.PathSeparator {
+		return ""
+	}
+
 	return filepath.Base(path)
 }
 
 // GetFileNameFromContentDisposition returns filename from Content-Disposition header
 func GetFileNameFromContentDisposition(header string) (string, error) {
-	args := strings.Split(header, " ")
-	target := args[1]
-	if target == "" {
-		return "", fmt.Errorf("invalid header")
-	}
-	equalCharIndex := strings.Index(target, "=")
-	lastCharIndex := len(target)
+	lowerHeader := strings.ToLower(header)
+	if idx := strings.Index(lowerHeader, "filename="); idx != -1 {
+		start := idx + len("filename=")
+		filename := header[start:]
 
-	if equalCharIndex == lastCharIndex {
-		return "", fmt.Errorf("invalid header")
+		// ; after filename
+		if idx = strings.Index(filename, ";"); idx != -1 {
+			filename = filename[:idx]
+		}
+
+		// " " space after filename
+		if idx = strings.Index(filename, " "); idx != -1 {
+			filename = filename[:idx]
+		}
+
+		return strings.TrimSpace(filename), nil
 	}
-	return target[equalCharIndex+1 : lastCharIndex], nil
+
+	return "", errors.New("invalid header")
 }
 
-// SaveFileOnDisk saves file on disk given its path and content :)
+// SaveFileOnDisk saves file on disk given its path and content
+// It will not overwrite existing files on your disk
 func SaveFileOnDisk(path, filename string, content io.ReadCloser) error {
+	defer content.Close()
 	newFilePath := JoinPathParts(path, filename)
 
-	// TODO: Dont replace file if exists
-	defer content.Close()
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return err
+	// Ensure the directory exists
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+		return fmt.Errorf("failed to create directory %s: %v", path, err)
 	}
 
+	// Check if the file already exists
+	if _, err := os.Stat(newFilePath); !os.IsNotExist(err) {
+		return fmt.Errorf("file %s already exists", newFilePath)
+	}
+
+	// Create the new file
 	file, err := os.Create(newFilePath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
+	// Copy the content to the file
 	_, err = io.Copy(file, content)
 	if err != nil {
 		return err
