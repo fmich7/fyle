@@ -17,7 +17,7 @@ func TestUploadFile(t *testing.T) {
 	// Create a temp file for testing
 	tempFile, err := os.CreateTemp("", "testfile")
 	assert.NoError(t, err, "Failed to create temporary file")
-	defer os.Remove(tempFile.Name())
+	defer os.RemoveAll(tempFile.Name())
 
 	// Write data to temp file
 	_, err = tempFile.Write([]byte("SOME DATA!!!"))

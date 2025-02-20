@@ -28,8 +28,6 @@ func (s *Server) HandleFileDownload(w http.ResponseWriter, r *http.Request) {
 	// Get filename from valid path
 	filename := utils.GetFileNameFromPath(reqBody.Path)
 
-	fmt.Println(s.store.GetFileUploadsLocation())
-	fmt.Println(reqBody)
 	// Check if file exists on a server
 	path, valid := utils.GetLocationOnServer(
 		s.store.GetFileUploadsLocation(),

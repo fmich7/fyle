@@ -251,6 +251,6 @@ func TestSaveFileOnDisk(t *testing.T) {
 	assert.NoError(err, "Failed to read file")
 	assert.Equal(content, file, "File content does not match")
 
-	err = os.Remove(path)
+	err = os.RemoveAll(path)
 	assert.NoError(err, "Failed to do a cleanup")
 }
