@@ -40,6 +40,8 @@ var downloadCmd = &cobra.Command{
 func DownloadFile(serverPath, destination string) {
 	data := types.DownloadRequest{
 		Path: serverPath,
+		// TODO: AUTH!!!!!!
+		User: "fmich7",
 	}
 
 	marshalled, err := json.Marshal(data)
@@ -74,7 +76,6 @@ func DownloadFile(serverPath, destination string) {
 	}
 
 	err = utils.SaveFileOnDisk(destination, filename, res.Body)
-	fmt.Println(destination, filename)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error: couldn't save file on disk", err)
 		return
