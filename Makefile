@@ -4,10 +4,10 @@ build-client:
 build-server:
 	cd cmd/server && go build -o ../../bin/fyle-server
 
-server:
-	@cd cmd/server && go run main.go
-client: 
-	@cd cmd/client && go run main.go
+server: build-server
+	@./bin/fyle-server
+client: build-client
+	@./bin/fyle-client
 
 test:
 	go test -v -timeout 5s -race ./...
