@@ -11,8 +11,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// path on server
-// filepath - file on disk
 var uploadCmd = &cobra.Command{
 	Use: "upload",
 	Short: "Uploads a file to server\n" +
@@ -20,59 +18,45 @@ var uploadCmd = &cobra.Command{
 		"Usage: fyle upload <path>",
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		filepath := args[0]
-		path := "."
+		localPath := args[0]
+		serverPath := "."
 		if len(args) > 1 {
-			path = args[1]
+			serverPath = args[1]
 		}
 
-		UploadFile(filepath, path)
+		UploadFile(localPath, serverPath)
 	},
 }
 
+type MultiPartForm struct {
+	FormData            *bytes.Buffer
+	FormDataContentType string
+}
+
 // UploadFile uploads a file to the server
-func UploadFile(filepath, location string) error {
-	file, err := os.Open(filepath)
+func UploadFile(localPath, serverPath string) error {
+	file, err := os.Open(localPath)
 	if err != nil {
-		return fmt.Errorf("Error opening file: %s", err)
+		return fmt.Errorf("opening file: %v", err)
 	}
 	defer file.Close()
 
 	// Create a buffer to store multipart form data
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	defer writer.Close()
-
-	if err := writer.WriteField("user", User); err != nil {
+	form, err := PrepareMultipartForm(file, localPath, serverPath)
+	if err != nil {
 		return err
 	}
-	if err := writer.WriteField("path", location); err != nil {
-		return err
-	}
-
-	// Create form
-	part, err := writer.CreateFormFile("file", filepath)
-	if err != nil {
-		return fmt.Errorf("Error creating form: %s", err)
-	}
-	_, err = io.Copy(part, file)
-	if err != nil {
-		return fmt.Errorf("Error copying file to form: %s", err)
-	}
-
-	// Close writer to finalize form
-	writer.Close()
 
 	// Create request and set headers
-	resp, err := http.Post(UploadURL, writer.FormDataContentType(), body)
+	resp, err := http.Post(UploadURL, form.FormDataContentType, form.FormData)
 	if err != nil {
-		return fmt.Errorf("Error creating request: %s", err)
+		return fmt.Errorf("creating request: %v", err)
 	}
 	defer resp.Body.Close()
 
 	// Check if request was successful
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Error uploading file: %s", resp.Status)
+	if resp.StatusCode != http.StatusCreated {
+		return fmt.Errorf("uploading file: %v", resp.Status)
 	}
 
 	// Print response
@@ -84,4 +68,32 @@ func UploadFile(filepath, location string) error {
 
 func init() {
 	rootCmd.AddCommand(uploadCmd)
+}
+
+func PrepareMultipartForm(file *os.File, localPath, serverPath string) (*MultiPartForm, error) {
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	defer writer.Close()
+
+	if err := writer.WriteField("user", User); err != nil {
+		return nil, err
+	}
+	if err := writer.WriteField("path", serverPath); err != nil {
+		return nil, err
+	}
+
+	// Create form
+	part, err := writer.CreateFormFile("file", localPath)
+	if err != nil {
+		return nil, fmt.Errorf("creating form: %v", err)
+	}
+	_, err = io.Copy(part, file)
+	if err != nil {
+		return nil, fmt.Errorf("copying file to form: %v", err)
+	}
+
+	return &MultiPartForm{
+		FormData:            body,
+		FormDataContentType: writer.FormDataContentType(),
+	}, nil
 }
