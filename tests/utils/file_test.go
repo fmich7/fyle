@@ -1,10 +1,11 @@
-package utils
+package utils_test
 
 import (
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,7 +36,7 @@ func TestLocationOnServer(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.expected, func(t *testing.T) {
 			// Call the function being tested
-			safePath, ok := GetLocationOnServer(test.baseDir, test.user, test.location, test.filename)
+			safePath, ok := utils.GetLocationOnServer(test.baseDir, test.user, test.location, test.filename)
 
 			// Check if the function returned the expected result
 			assert.True(t, ok)
@@ -71,7 +72,7 @@ func TestLocationOnServerUnsafe(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
 			// Call the function being tested
-			_, ok := GetLocationOnServer(test.rootAbsPath, test.username, test.subfolders, test.filename)
+			_, ok := utils.GetLocationOnServer(test.rootAbsPath, test.username, test.subfolders, test.filename)
 			assert.False(t, ok)
 		})
 	}

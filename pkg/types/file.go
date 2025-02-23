@@ -1,6 +1,7 @@
 package types
 
 import (
+	"bytes"
 	"mime/multipart"
 	"net/textproto"
 )
@@ -25,4 +26,9 @@ func NewFile(header *multipart.FileHeader, file multipart.File, owner string, lo
 		Owner:    owner,
 		Location: location,
 	}
+}
+
+type MultiPartForm struct {
+	FormData            *bytes.Buffer
+	FormDataContentType string
 }
