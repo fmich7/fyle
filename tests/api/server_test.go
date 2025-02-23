@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/fmich7/fyle/pkg/api"
+	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -40,8 +40,11 @@ func TestHandleFileUpload(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	// Create mock server instance with a mock store
-	storage := utils.NewMockStorage("uploads")
-	mockServer := api.NewServer(":0", storage)
+	storage, err := utils.NewMockStorage("uploads")
+	if err != nil {
+		t.Fatal(err)
+	}
+	mockServer := server.NewServer(":0", storage)
 
 	// Call handler
 	mockServer.HandleFileUpload(recorder, req)

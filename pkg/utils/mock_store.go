@@ -27,14 +27,14 @@ func (m *MockStore) GetFileUploadsLocation() string {
 }
 
 // NewMockStorage creates a new MockStore object
-func NewMockStorage(fileUploadsLocation string) *MockStore {
+func NewMockStorage(fileUploadsLocation string) (*MockStore, error) {
 	// Get the absolute path of the file uploads location
 	rootStoragePath, err := filepath.Abs(fileUploadsLocation)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	return &MockStore{
 		location: rootStoragePath,
-	}
+	}, nil
 }

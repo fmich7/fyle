@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Replaces aliases that user might use as a home dir
+// ReplaceHomeDirAliases replaces aliases that user might use as a home dir
 func ReplaceHomeDirAliases(path string) string {
 	res := path
 	// Handle home shortcuts -> defaults to user directory
