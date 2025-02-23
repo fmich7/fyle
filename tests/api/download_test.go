@@ -13,6 +13,7 @@ import (
 	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/fmich7/fyle/pkg/types"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHandleFileDownload(t *testing.T) {
@@ -49,7 +50,8 @@ func TestHandleFileDownload(t *testing.T) {
 	assert.NoError(err, "Expected no error with marshalling data")
 
 	// server
-	storage := storage.NewDiskStorage(tmpDir)
+	storage, err := storage.NewDiskStorage(tmpDir)
+	require.NoError(t, err, "Expected no error creating storage")
 	server := api.NewServer(":0", storage)
 
 	// TEST: send request and validate if file matches
