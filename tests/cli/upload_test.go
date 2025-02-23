@@ -1,49 +1,41 @@
 package cli_test
 
 import (
-	"fmt"
 	"io"
 
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/fmich7/fyle/pkg/cli"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUploadFile(t *testing.T) {
+	assert := assert.New(t)
+	afs := afero.NewMemMapFs()
+
 	// Create a temp file for testing
-	tempFile, err := os.CreateTemp("", "testfile")
-	assert.NoError(t, err, "Failed to create temporary file")
-	defer os.Remove(tempFile.Name())
-
-	// Write data to temp file
-	_, err = tempFile.Write([]byte("SOME DATA!!!"))
-	assert.NoError(t, err, "Failed to write content to temporary file")
-
-	// Close temp file
-	err = tempFile.Close()
-	assert.NoError(t, err, "Failed to close temporary file")
-
-	fmt.Println("Temp file path:", tempFile.Name()) // Debugging
+	filename := "testfile"
+	err := afero.WriteFile(afs, filename, []byte("SOME DATA!!!"), 0644)
+	assert.NoError(err, "Failed to create temporary file")
 
 	// Mock server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Verify method
-		assert.Equal(t, http.MethodPost, r.Method, "Expected POST request")
+		assert.Equal(http.MethodPost, r.Method, "Expected POST request")
 
 		// Verify content type
-		assert.Contains(t, r.Header.Get("Content-Type"), "multipart/form-data", "Expected multipart form data")
+		assert.Contains(r.Header.Get("Content-Type"), "multipart/form-data", "Expected multipart form data")
 
 		// Read request body
 		body, err := io.ReadAll(r.Body)
-		assert.NoError(t, err, "Failed to read request body")
-		assert.Contains(t, string(body), "SOME DATA!!!", "Expected request body to contain file data")
+		assert.NoError(err, "Failed to read request body")
+		assert.Contains(string(body), "SOME DATA!!!", "Expected request body to contain file data")
 
 		// Send response
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte("response body"))
 	}))
 	defer server.Close()
@@ -52,7 +44,7 @@ func TestUploadFile(t *testing.T) {
 	cli.UploadURL = server.URL
 
 	// Test UploadFile
-	err = cli.UploadFile(tempFile.Name(), "testLocation")
+	err = cli.UploadFile(filename, "testLocation")
 
-	assert.NoError(t, err, "Expected no error from UploadFile")
+	assert.NoError(err, "Expected no error from UploadFile")
 }

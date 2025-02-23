@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/fmich7/fyle/pkg/types"
 	"github.com/spf13/cobra"
 )
 
@@ -26,11 +27,6 @@ var uploadCmd = &cobra.Command{
 
 		UploadFile(localPath, serverPath)
 	},
-}
-
-type MultiPartForm struct {
-	FormData            *bytes.Buffer
-	FormDataContentType string
 }
 
 // UploadFile uploads a file to the server
@@ -70,7 +66,7 @@ func init() {
 	rootCmd.AddCommand(uploadCmd)
 }
 
-func PrepareMultipartForm(file *os.File, localPath, serverPath string) (*MultiPartForm, error) {
+func PrepareMultipartForm(file *os.File, localPath, serverPath string) (*types.MultiPartForm, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	defer writer.Close()
@@ -92,7 +88,7 @@ func PrepareMultipartForm(file *os.File, localPath, serverPath string) (*MultiPa
 		return nil, fmt.Errorf("copying file to form: %v", err)
 	}
 
-	return &MultiPartForm{
+	return &types.MultiPartForm{
 		FormData:            body,
 		FormDataContentType: writer.FormDataContentType(),
 	}, nil

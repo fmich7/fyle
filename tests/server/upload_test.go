@@ -1,4 +1,4 @@
-package api_test
+package server_test
 
 import (
 	"bytes"
@@ -40,7 +40,7 @@ func TestHandleFileUpload(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	// Create mock server instance with a mock store
-	storage, err := utils.NewMockStorage("uploads")
+	storage, err := utils.NewFakeStorage("uploads")
 	if err != nil {
 		t.Fatal(err)
 	}
