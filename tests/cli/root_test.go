@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/fmich7/fyle/pkg/cli"
+	"github.com/spf13/afero"
 )
 
 func TestExecute(t *testing.T) {
@@ -19,6 +20,7 @@ func TestExecute(t *testing.T) {
 	}()
 
 	// Test function
+	cli := cli.NewCliClient(afero.NewMemMapFs())
 	cli.Execute()
 
 	// Close the write end of the pipe and read output

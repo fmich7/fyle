@@ -41,6 +41,7 @@ func TestUploadFile(t *testing.T) {
 	defer server.Close()
 
 	// Set mock upload URL
+	cli := cli.NewCliClient(afs)
 	cli.UploadURL = server.URL
 
 	// Test UploadFile
