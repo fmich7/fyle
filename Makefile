@@ -1,12 +1,18 @@
-build: client server
-client:
+build: build-client build-server
+build-client:
 	cd cmd/client && go build -o ../../bin/fyle-client
-server:
+build-server:
 	cd cmd/server && go build -o ../../bin/fyle-server
 
-run-server:
-	@cd cmd/server && go run main.go
-run-client: 
-	@cd cmd/client && go run main.go
+server: build-server
+	@./bin/fyle-server
+client: build-client
+	@./bin/fyle-client
+
+test:
+	go test -v -timeout 5s -race ./...
+coverage:
+	go test -timeout 5s -race ./... -coverprofile=cover.out
+	go tool cover -html=cover.out
 
 .PHONY: client server
