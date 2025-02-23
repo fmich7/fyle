@@ -51,5 +51,6 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 
 	// Return 201 Created status
 	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("File uploaded successfully"))
 	log.Println("File uploaded successfully:", file.Owner, file.Filename)
 }
