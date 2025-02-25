@@ -12,14 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// DownloadFunc is a function that downloads a file from a server
-// It's purpose is to easily replace this in tests
-type DownloadFunc func(string, string) error
-
 // NewDownloadCmd creates a new download command
-// serverPath is the path to the file on the server
-// destination is the path to the directory where the file will be saved
-func NewDownloadCmd(download DownloadFunc) *cobra.Command {
+func (c *CliClient) NewDownloadCmd() *cobra.Command {
 	return &cobra.Command{
 		Use: "download",
 		Short: "Downloads a file from server\n" +
@@ -28,32 +22,31 @@ func NewDownloadCmd(download DownloadFunc) *cobra.Command {
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			serverPath := args[0]
-			destination := "."
+			localPath := "."
 			if len(args) > 1 {
-				destination = args[1]
+				localPath = args[1]
 			}
 
-			destination, err := utils.GetBaseDir(destination)
+			localPath, err := utils.GetBaseDir(localPath)
 			if err != nil {
 				fmt.Fprintln(cmd.ErrOrStderr(), "error: couldn't process given path")
 				return
 			}
 
-			if err = download(serverPath, destination); err != nil {
+			if err = c.DownloadFile(serverPath, localPath); err != nil {
 				fmt.Fprintln(cmd.ErrOrStderr(), err)
 			} else {
-				fmt.Fprintf(cmd.OutOrStdout(), "File saved at %s\n", destination)
+				fmt.Fprintf(cmd.OutOrStdout(), "File saved at %s\n", localPath)
 			}
 		},
 	}
 }
 
 // DownloadFile handles download request from cli
-func DownloadFile(serverPath, destination string) error {
+func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	data := types.DownloadRequest{
 		Path: serverPath,
-		// TODO: AUTH!!!!!!
-		User: "fmich7",
+		User: c.User,
 	}
 
 	// Marshall request data
@@ -63,7 +56,7 @@ func DownloadFile(serverPath, destination string) error {
 	}
 
 	// Send request
-	req, err := http.NewRequest("POST", DownloadURL, bytes.NewBuffer(marshalled))
+	req, err := http.NewRequest("POST", c.DownloadURL, bytes.NewBuffer(marshalled))
 	if err != nil {
 		return errors.New("error: couldn't construct a request")
 	}
@@ -88,14 +81,10 @@ func DownloadFile(serverPath, destination string) error {
 	}
 
 	// Save file on disk
-	err = utils.SaveFileOnDisk(destination, filename, res.Body)
+	err = utils.SaveFileOnDisk(localPath, filename, res.Body)
 	if err != nil {
 		return errors.New("error: couldn't save file on disk")
 	}
 
 	return nil
-}
-
-func init() {
-	rootCmd.AddCommand(NewDownloadCmd(DownloadFile))
 }
