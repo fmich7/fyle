@@ -23,7 +23,8 @@ func NewServer(listenAddr string, store types.Storage) *Server {
 // Start starts the server
 func (s *Server) Start() error {
 	http.HandleFunc("POST /file", s.HandleFileUpload)
-	// http.HandleFunc("GET /file", s.HandleFileDownload)
+	// TODO: Fix this
+	http.HandleFunc("POST /getfile", s.HandleFileDownload)
 
 	return http.ListenAndServe(s.listenAddr, nil)
 }

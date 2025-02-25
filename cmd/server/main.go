@@ -10,7 +10,7 @@ import (
 
 func main() {
 	PORT := ":3000"
-	store, err := storage.NewDiskStorage("uploads")
+	store, err := storage.NewDiskStorage("uploads", nil)
 	if err != nil {
 		log.Fatalf("error creating disk storage: %v\n", err)
 	}
