@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/fmich7/fyle/pkg/types"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -20,27 +20,22 @@ func TestHandleFileDownload(t *testing.T) {
 	assert := assert.New(t)
 
 	// create storage and mock file
-	tmpDir := t.TempDir()
 	filename := "tempfile.txt"
 	user := "user"
-	absUserDir := filepath.Join(tmpDir, user)
-	absFilePath := filepath.Join(absUserDir, filename)
 	content := []byte("some content")
 
-	// create user dir
-	err := os.MkdirAll(absUserDir, 0777)
-	assert.NoError(err, "Expected no error creating user folder in db")
+	// storage
+	afs := afero.NewMemMapFs()
 
-	// mock file
-	file, err := os.Create(absFilePath)
-	assert.NoError(err, "Expected no error on file creation")
-	assert.FileExists(absFilePath, "Expected %s to be created", filename)
+	storage, err := storage.NewDiskStorage("uploads", afs)
+	require.NoError(t, err, "Expected no error creating storage")
 
-	// write data to file
-	_, err = file.Write(content)
-	file.Close()
-	assert.NoError(err, "Expected no error on writing to %s", filename)
+	fileServerPath := filepath.Join(storage.GetFileUploadsLocation(), user, filename)
+	afero.WriteFile(afs, fileServerPath, content, 0777)
 
+	// server
+	server := server.NewServer(":0", storage)
+	t.Log(storage.GetFileUploadsLocation())
 	// request
 	body := new(bytes.Buffer)
 	err = json.NewEncoder(body).Encode(types.DownloadRequest{
@@ -49,13 +44,8 @@ func TestHandleFileDownload(t *testing.T) {
 	})
 	assert.NoError(err, "Expected no error with marshalling data")
 
-	// server
-	storage, err := storage.NewDiskStorage(tmpDir)
-	require.NoError(t, err, "Expected no error creating storage")
-	server := server.NewServer(":0", storage)
-
 	// TEST: send request and validate if file matches
-	req := httptest.NewRequest("POST", "/download", body)
+	req := httptest.NewRequest("POST", "/getfile", body)
 	req.Header.Set("Content-Type", "application/json")
 	response := httptest.NewRecorder()
 	server.HandleFileDownload(response, req)
@@ -71,7 +61,7 @@ func TestHandleFileDownload(t *testing.T) {
 	})
 	assert.NoError(err, "Expected no error with marshalling data")
 
-	req = httptest.NewRequest("POST", "/download", body)
+	req = httptest.NewRequest("POST", "/getfile", body)
 	response = httptest.NewRecorder()
 	server.HandleFileDownload(response, req)
 	assert.Equal(http.StatusBadRequest, response.Code, string(data))
@@ -83,7 +73,7 @@ func TestHandleFileDownload(t *testing.T) {
 	})
 	assert.NoError(err, "Expected no error with marshalling data")
 
-	req = httptest.NewRequest("POST", "/download", body)
+	req = httptest.NewRequest("POST", "/getfile", body)
 	response = httptest.NewRecorder()
 	server.HandleFileDownload(response, req)
 	assert.Equal(http.StatusBadRequest, response.Code, string(data))
