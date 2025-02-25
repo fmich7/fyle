@@ -19,7 +19,15 @@ make build
   ```
 - Upload file to the server
   ```bash
-  fyle upload ./<your-file> ./<some path>
+  fyle upload <your-file> <server-path>
   ```
 - Now file should be uploaded at \
   `<path to server/uploads/<user>/<some path>/<file>`
+- Download file from the server
+
+  ```bash
+  fyle download <server-path> <download-location>
+  ```
+
+  > - It will not overwrite existing user files\
+  > - < download-location > directory must exist before
