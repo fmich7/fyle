@@ -10,10 +10,11 @@ import (
 
 // CliClient is the client type for the cli
 type CliClient struct {
-	rootCmd   *cobra.Command
-	fs        afero.Fs
-	UploadURL string
-	User      string
+	rootCmd     *cobra.Command
+	fs          afero.Fs
+	UploadURL   string
+	DownloadURL string
+	User        string
 }
 
 // NewCliClient creates a new CliClient object
@@ -26,8 +27,9 @@ func NewCliClient(fs afero.Fs) *CliClient {
 		fs: fs,
 
 		// TODO: CONFIG!!!!!
-		UploadURL: "http://localhost:3000/file",
-		User:      "fmich7",
+		UploadURL:   "http://localhost:3000/file",
+		DownloadURL: "http://localhost:3000/getfile",
+		User:        "fmich7",
 	}
 
 	// Attaches commands to the client
@@ -45,4 +47,5 @@ func (c *CliClient) Execute() {
 
 func (c *CliClient) attachCommands() {
 	c.rootCmd.AddCommand(c.NewUploadCmd())
+	c.rootCmd.AddCommand(c.NewDownloadCmd())
 }

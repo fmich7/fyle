@@ -13,18 +13,18 @@ import (
 )
 
 func TestNewDiskStorage(t *testing.T) {
-	storage, err := storage.NewDiskStorage("", afero.NewMemMapFs())
+	storage, err := storage.NewDiskStorage("uploads", afero.NewMemMapFs())
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	wd, err := os.Getwd()
 	require.NoError(t, err, "failed to get working directory: %v", err)
 
-	assert.Equal(t, wd, storage.GetFileUploadsLocation(), "unexpected file upload location")
+	assert.Equal(t, filepath.Join(wd, "uploads"), storage.GetFileUploadsLocation(), "unexpected file upload location")
 }
 
 func TestStoreFile(t *testing.T) {
 	afs := afero.NewMemMapFs()
-	storage, err := storage.NewDiskStorage("", afs)
+	storage, err := storage.NewDiskStorage("uploads", afs)
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	filename := "test.txt"
@@ -57,7 +57,7 @@ func TestStoreFile(t *testing.T) {
 
 func TestRetrieveFile(t *testing.T) {
 	afs := afero.NewMemMapFs()
-	storage, err := storage.NewDiskStorage("", afs)
+	storage, err := storage.NewDiskStorage("uploads", afs)
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	filename := "test.txt"

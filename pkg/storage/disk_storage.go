@@ -26,11 +26,12 @@ func NewDiskStorage(fileUploadsLocation string, fs afero.Fs) (*DiskStorage, erro
 	}
 
 	// Create the uploads directory if it doesn't exist
-	_, err := os.Stat(fileUploadsLocation)
-	if os.IsNotExist(err) {
-		fs.Mkdir(fileUploadsLocation, os.ModePerm)
-	} else {
-		return nil, fmt.Errorf("creating uploads directory: %v", err)
+	if _, err := os.Stat(fileUploadsLocation); os.IsNotExist(err) {
+		if err := fs.Mkdir(fileUploadsLocation, os.ModePerm); err != nil {
+			return nil, fmt.Errorf("failed to create uploads directory: %v", err)
+		}
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to check uploads directory: %v", err)
 	}
 
 	// Get the absolute path of the file uploads location
