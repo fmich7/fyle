@@ -6,7 +6,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"os"
 
 	"github.com/fmich7/fyle/pkg/types"
 	"github.com/spf13/afero"
@@ -29,7 +28,7 @@ func (c *CliClient) NewUploadCmd() *cobra.Command {
 			}
 
 			if err := c.UploadFile(localPath, serverPath); err != nil {
-				fmt.Fprintf(os.Stderr, "error uploading file: %v\n", err)
+				fmt.Fprintf(cmd.ErrOrStderr(), "error uploading file: %v\n", err)
 			}
 		},
 	}

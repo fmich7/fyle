@@ -126,7 +126,7 @@ func TestLocationOnServer(t *testing.T) {
 func TestLocationOnServerUnsafe(t *testing.T) {
 	// Get the absolute path of the current working directory
 	baseDirAbs, err := os.Getwd()
-	assert.NoError(t, err, "error getting working dir")
+	assert.NoError(t, err, "couldn't get working dir")
 
 	// Define the root storage path
 	storageRootAbsPath := filepath.Join(baseDirAbs, "uploads")

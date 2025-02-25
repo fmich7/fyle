@@ -52,13 +52,13 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	// Marshall request data
 	marshalled, err := json.Marshal(data)
 	if err != nil {
-		return errors.New("error: marshalling data")
+		return errors.New("marshalling data")
 	}
 
 	// Send request
 	req, err := http.NewRequest("POST", c.DownloadURL, bytes.NewBuffer(marshalled))
 	if err != nil {
-		return errors.New("error: couldn't construct a request")
+		return errors.New("couldn't construct a request")
 	}
 	req.Header.Set("Content-Type", "application/json")
 
@@ -69,7 +69,7 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	// Send request
 	res, err := client.Do(req)
 	if err != nil {
-		return errors.New("error: impossible to send a request")
+		return errors.New("impossible to send a request")
 	}
 	defer res.Body.Close()
 
@@ -77,13 +77,13 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	dispositionHeader := res.Header.Get("Content-Disposition")
 	filename, err := utils.GetFileNameFromContentDisposition(dispositionHeader)
 	if err != nil {
-		return errors.New("error: bad request headers")
+		return errors.New("bad request headers")
 	}
 
 	// Save file on disk
 	err = utils.SaveFileOnDisk(localPath, filename, res.Body)
 	if err != nil {
-		return errors.New("error: couldn't save file on disk")
+		return errors.New("couldn't save file on disk")
 	}
 
 	return nil
