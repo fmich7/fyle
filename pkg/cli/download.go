@@ -15,10 +15,10 @@ import (
 // NewDownloadCmd creates a new download command
 func (c *CliClient) NewDownloadCmd() *cobra.Command {
 	return &cobra.Command{
-		Use: "download",
-		Short: "Downloads a file from server\n" +
-			"As of now, only single file download is supported\n" +
-			"Usage: fyle download <path> <destination>",
+		Use:   "download",
+		Short: "Downloads a file from server",
+		Long: "As of now, only single file download is supported\n" +
+			"Usage: fyle download <serverPath> <localPath>",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			serverPath := args[0]

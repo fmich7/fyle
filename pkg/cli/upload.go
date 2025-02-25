@@ -16,10 +16,10 @@ import (
 // NewUploadCmd creates a new upload command
 func (c *CliClient) NewUploadCmd() *cobra.Command {
 	return &cobra.Command{
-		Use: "upload",
-		Short: "Uploads a file to server\n" +
-			"As of now, only single file upload is supported\n" +
-			"Usage: fyle upload <path>",
+		Use:   "upload",
+		Short: "Uploads a file to server",
+		Long: "As of now, only single file upload is supported\n" +
+			"Usage: fyle upload <localPath> <serverPath>",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			localPath := args[0]

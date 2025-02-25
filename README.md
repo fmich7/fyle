@@ -11,23 +11,26 @@ make build
 ./bin/fyle-server
 ```
 
-2. ❗This is a temporary solution❗
+2. Run client
 
-- Set alias in your shell
-  ```bash
-  alias fyle='./bin/fyle-client'
-  ```
-- Upload file to the server
-  ```bash
-  fyle upload <your-file> <server-path>
-  ```
+```bash
+go install github.com/fmich7/fyle/cmd/client
+```
+
+3. Upload file to the server
+
+```bash
+fyle upload <localPath> <serverPath>
+```
+
 - Now file should be uploaded at \
-  `<path to server/uploads/<user>/<some path>/<file>`
-- Download file from the server
+  `<server>/uploads/<user>/<path>/<file>`
 
-  ```bash
-  fyle download <server-path> <download-location>
-  ```
+4. Download file from the server
 
-  > - It will not overwrite existing user files\
-  > - < download-location > directory must exist before
+```bash
+fyle download <serverPath> <localPath>
+```
+
+> - It will not overwrite existing user files\
+> - < localPath directory > directory must exist before
