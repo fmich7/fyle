@@ -4,8 +4,8 @@ build-client:
 build-server:
 	cd cmd/server && go build -o ../../bin/fyle-server
 
-server: build-server
-	@./bin/fyle-server
+server:
+	@cd cmd/server && go run main.go
 client: build-client
 	@./bin/fyle-client
 

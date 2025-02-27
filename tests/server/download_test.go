@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/fmich7/fyle/pkg/config"
 	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/fmich7/fyle/pkg/types"
@@ -34,7 +35,7 @@ func TestHandleFileDownload(t *testing.T) {
 	afero.WriteFile(afs, fileServerPath, content, 0777)
 
 	// server
-	server := server.NewServer(":0", storage)
+	server := server.NewServer(config.NewTestingConfig(), storage)
 	t.Log(storage.GetFileUploadsLocation())
 	// request
 	body := new(bytes.Buffer)
