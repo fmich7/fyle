@@ -14,12 +14,13 @@ func main() {
 	cfg := new(config.Config)
 	cfg.LoadConfig("example_server.env")
 
-	store, err := storage.NewDiskStorage(cfg.UploadsLocation, afero.NewOsFs())
+	fileStorage, err := storage.NewDiskFileStorage(cfg.UploadsLocation, afero.NewOsFs())
 	if err != nil {
 		log.Fatalf("error creating disk storage: %v\n", err)
 	}
+	serverStorage := storage.NewServerStorage(fileStorage, nil)
 
-	server := server.NewServer(cfg, store)
+	server := server.NewServer(cfg, serverStorage)
 
 	fmt.Println("Server listening on port", cfg.ServerPort)
 	log.Fatal(server.Start())
