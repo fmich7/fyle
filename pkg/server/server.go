@@ -4,17 +4,17 @@ import (
 	"net/http"
 
 	"github.com/fmich7/fyle/pkg/config"
-	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/storage"
 )
 
 // Server is a struct that represents the server
 type Server struct {
 	listenAddr string
-	store      types.Storage
+	store      storage.Storage
 }
 
 // NewServer creates a new instance of the Server struct
-func NewServer(cfg *config.Config, store types.Storage) *Server {
+func NewServer(cfg *config.Config, store storage.Storage) *Server {
 	return &Server{
 		listenAddr: cfg.ServerPort,
 		store:      store,
