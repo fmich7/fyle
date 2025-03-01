@@ -27,8 +27,7 @@ func TestHandleFileDownload(t *testing.T) {
 
 	// storage
 	afs := afero.NewMemMapFs()
-
-	storage, err := storage.NewDiskStorage("uploads", afs)
+	storage, err := storage.NewTestingStorage(afs)
 	require.NoError(t, err, "Expected no error creating storage")
 
 	fileServerPath := filepath.Join(storage.GetFileUploadsLocation(), user, filename)

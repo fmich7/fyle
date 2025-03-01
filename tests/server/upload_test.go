@@ -9,7 +9,8 @@ import (
 
 	"github.com/fmich7/fyle/pkg/config"
 	"github.com/fmich7/fyle/pkg/server"
-	"github.com/fmich7/fyle/pkg/utils"
+	"github.com/fmich7/fyle/pkg/storage"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,7 +42,8 @@ func TestHandleFileUpload(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	// Create mock server instance with a mock store
-	storage, err := utils.NewFakeStorage("uploads")
+	afs := afero.NewMemMapFs()
+	storage, err := storage.NewTestingStorage(afs)
 	if err != nil {
 		t.Fatal(err)
 	}

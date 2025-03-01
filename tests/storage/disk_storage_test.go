@@ -13,7 +13,7 @@ import (
 )
 
 func TestNewDiskStorage(t *testing.T) {
-	storage, err := storage.NewDiskStorage("uploads", afero.NewMemMapFs())
+	storage, err := storage.NewDiskFileStorage("uploads", afero.NewMemMapFs())
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	wd, err := os.Getwd()
@@ -24,7 +24,7 @@ func TestNewDiskStorage(t *testing.T) {
 
 func TestStoreFile(t *testing.T) {
 	afs := afero.NewMemMapFs()
-	storage, err := storage.NewDiskStorage("uploads", afs)
+	storage, err := storage.NewDiskFileStorage("uploads", afs)
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	filename := "test.txt"
@@ -57,7 +57,7 @@ func TestStoreFile(t *testing.T) {
 
 func TestRetrieveFile(t *testing.T) {
 	afs := afero.NewMemMapFs()
-	storage, err := storage.NewDiskStorage("uploads", afs)
+	storage, err := storage.NewDiskFileStorage("uploads", afs)
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	filename := "test.txt"
@@ -77,7 +77,7 @@ func TestRetrieveFile(t *testing.T) {
 
 func TestGetFileUploadsLocation(t *testing.T) {
 	afs := afero.NewMemMapFs()
-	storage, err := storage.NewDiskStorage("uploads", afs)
+	storage, err := storage.NewDiskFileStorage("uploads", afs)
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	wd, err := os.Getwd()

@@ -10,16 +10,16 @@ import (
 	"github.com/spf13/afero"
 )
 
-// DiskStorage is a struct that implements the Storage interface
+// DiskFileStorage is a struct that implements the Storage interface
 // It is used to store files on disk
-type DiskStorage struct {
+type DiskFileStorage struct {
 	fs       afero.Fs
 	location string
 }
 
-// NewDiskStorage creates a new DiskStorage object
+// NewDiskFileStorage creates a new DiskStorage object
 // fs (nil is standard filesystem), you can pass aerof.Fs object for testing
-func NewDiskStorage(fileUploadsLocation string, fs afero.Fs) (*DiskStorage, error) {
+func NewDiskFileStorage(fileUploadsLocation string, fs afero.Fs) (*DiskFileStorage, error) {
 	// Default to OS filesystem if none is provided
 	if fs == nil {
 		fs = afero.NewOsFs()
@@ -40,14 +40,14 @@ func NewDiskStorage(fileUploadsLocation string, fs afero.Fs) (*DiskStorage, erro
 		return nil, fmt.Errorf("getting abs file upload location: %v", err)
 	}
 
-	return &DiskStorage{
+	return &DiskFileStorage{
 		location: rootStoragePath,
 		fs:       fs,
 	}, nil
 }
 
 // UploadFile creates a file in the disk storage
-func (d *DiskStorage) StoreFile(file *types.File) error {
+func (d *DiskFileStorage) StoreFile(file *types.File) error {
 	defer file.Data.Close()
 
 	// Create file in disk storage
@@ -68,13 +68,13 @@ func (d *DiskStorage) StoreFile(file *types.File) error {
 
 // RetrieveFile returns io.ReaderCloser of stored file
 // Allows to copy content from file without loading it to memory
-func (d *DiskStorage) RetrieveFile(path string) (io.ReadCloser, error) {
+func (d *DiskFileStorage) RetrieveFile(path string) (io.ReadCloser, error) {
 	return d.fs.Open(path)
 }
 
 // createFile creates a file in the disk storage
 // It creates the directory if it doesn't exist
-func (d *DiskStorage) createFile(file *types.File) (afero.File, error) {
+func (d *DiskFileStorage) createFile(file *types.File) (afero.File, error) {
 	dirPath := filepath.Dir(file.Location)
 
 	// Check if the directory exists, and create it if it doesn't
@@ -89,6 +89,6 @@ func (d *DiskStorage) createFile(file *types.File) (afero.File, error) {
 }
 
 // GetFileUploadsLocation returns the file uploads location
-func (d *DiskStorage) GetFileUploadsLocation() string {
+func (d *DiskFileStorage) GetFileUploadsLocation() string {
 	return d.location
 }
