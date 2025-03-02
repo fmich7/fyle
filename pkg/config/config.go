@@ -25,7 +25,7 @@ func (c *Config) LoadConfig(fileName string) {
 		log.Println("No .env file found, using system environment variables")
 	}
 
-	c.ServerPort = getEnv("SERVER_PORT", ":8080")
+	c.ServerPort = getEnv("SERVER_PORT", ":3000")
 	c.JWTsecretKey = getEnv("SECRET_KEY", "als;dgasdfkasbf2ql4q")
 	c.UploadsLocation = getEnv("DISK_UPLOADS_LOCATION", "uploads")
 }
