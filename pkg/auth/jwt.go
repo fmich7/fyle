@@ -14,7 +14,7 @@ func CreateToken(secret, username string) (string, error) {
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	})
 
-	return token.SignedString(secret)
+	return token.SignedString([]byte(secret))
 }
 
 // ValidateToken validates given token

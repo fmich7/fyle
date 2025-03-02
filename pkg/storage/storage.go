@@ -16,6 +16,7 @@ type Storage interface {
 
 	// User related methods
 	StoreUser(user *auth.User) error
+	RetrieveUser(username string) (*auth.User, error)
 }
 
 // ServerStorage aggregates multiple storages that match Storage interface
