@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: cmd/server/Dockerfile
+    container_name: fyle-server
+    ports:
+      - "3000:3000"
