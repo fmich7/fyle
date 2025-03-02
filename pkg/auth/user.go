@@ -17,7 +17,9 @@ func NewUser(username, password string) (*User, error) {
 		return nil, err
 	}
 
+	// TODO: auto id
 	return &User{
+		ID:       0,
 		Username: username,
 		Password: hashedPassword,
 	}, nil
@@ -25,9 +27,8 @@ func NewUser(username, password string) (*User, error) {
 }
 
 // CheckPassword checks if user provided valid password
-func CheckPassword(storedPassword, enteredPassword string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(enteredPassword))
-	return err != nil
+func CheckPassword(storedPassword, enteredPassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(enteredPassword))
 }
 
 // hashPassword hashes given password

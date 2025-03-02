@@ -6,3 +6,15 @@ type DownloadRequest struct {
 	// TEMP SOLUTION BEFORE AUTH
 	User string `json:"user"`
 }
+
+// CreateUserRequest contains data that is used to create a new acc
+type CreateUserRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+// LoginUserRequest contains data that is used to create a new acc
+type LoginUserRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
