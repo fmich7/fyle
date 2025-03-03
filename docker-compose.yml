@@ -1,6 +1,20 @@
 version: "3.8"
 
 services:
+  postgres:
+    container_name: fyle-postgres
+    image: postgres
+    hostname: localhost
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: fyleDB
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
   server:
     build:
       context: .
@@ -8,3 +22,13 @@ services:
     container_name: fyle-server
     ports:
       - "3000:3000"
+    working_dir: /app
+    environment:
+      - GO_ENV=development
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/app
+
+volumes:
+  postgres-data:

@@ -28,6 +28,7 @@ func NewFile(header *multipart.FileHeader, file multipart.File, owner string, lo
 	}
 }
 
+// MultiPartForm represents a multi part form
 type MultiPartForm struct {
 	FormData            *bytes.Buffer
 	FormDataContentType string

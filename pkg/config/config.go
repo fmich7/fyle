@@ -4,14 +4,17 @@ import (
 	"log"
 	"os"
 
+	"github.com/fmich7/fyle/pkg/types"
 	"github.com/joho/godotenv"
 )
 
 // Config struct is a type that server is using for its configuration
 type Config struct {
-	ServerPort      string
-	JWTsecretKey    string
-	UploadsLocation string
+	ServerPort          string
+	JWTsecretKey        string
+	UploadsLocation     string
+	MigrationPath       string
+	PostgresCredentials types.PostgresCredentials
 }
 
 // LoadConfig loads config to Config from .env file with specified fileName
@@ -28,6 +31,8 @@ func (c *Config) LoadConfig(fileName string) {
 	c.ServerPort = getEnv("SERVER_PORT", ":3000")
 	c.JWTsecretKey = getEnv("SECRET_KEY", "als;dgasdfkasbf2ql4q")
 	c.UploadsLocation = getEnv("DISK_UPLOADS_LOCATION", "uploads")
+	c.MigrationPath = getEnv("MIGRATION_PATH", "migrations")
+	c.PostgresCredentials = getPostgresCredentials()
 }
 
 // getEnv looks up if key exists in env, if so returns it;s value
@@ -36,6 +41,17 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+// getPostgresCredentials return credentials that are used to connect to db
+func getPostgresCredentials() types.PostgresCredentials {
+	return types.PostgresCredentials{
+		DB_USER:     getEnv("POSTGRES_USER", "admin"),
+		DB_PASSWORD: getEnv("POSTGRES_PASSWORD", "root"),
+		DB_NAME:     getEnv("POSTGRES_NAME", "fyleDB"),
+		DB_HOST:     getEnv("POSTGRES_HOST", "postgres"),
+		DB_PORT:     getEnv("POSTGRES_PORT", "5432"),
+	}
 }
 
 // NewTestingConfig return config that is used for testing

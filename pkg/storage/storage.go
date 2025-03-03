@@ -9,26 +9,33 @@ import (
 
 // Storage represents a storage interface for server
 type Storage interface {
-	// File related methods
+	FileStorage
+	UserStorage
+}
+
+// FileStorage represents file related methods
+type FileStorage interface {
 	StoreFile(file *types.File) error
 	RetrieveFile(path string) (io.ReadCloser, error)
 	GetFileUploadsLocation() string
+}
 
-	// User related methods
+// UserStorage represents user related methods
+type UserStorage interface {
 	StoreUser(user *auth.User) error
 	RetrieveUser(username string) (*auth.User, error)
 }
 
 // ServerStorage aggregates multiple storages that match Storage interface
 type ServerStorage struct {
-	*DiskFileStorage
-	*DBUserStorage
+	FileStorage
+	UserStorage
 }
 
 // NewServerStorage returns new server storage
-func NewServerStorage(fileDB *DiskFileStorage, userDB *DBUserStorage) *ServerStorage {
+func NewServerStorage(fileDB FileStorage, userDB UserStorage) *ServerStorage {
 	return &ServerStorage{
-		DiskFileStorage: fileDB,
-		DBUserStorage:   userDB,
+		fileDB,
+		userDB,
 	}
 }

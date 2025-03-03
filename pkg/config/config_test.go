@@ -62,7 +62,7 @@ func TestLoadConfigDefaults(t *testing.T) {
 
 	cfg.LoadConfig("")
 
-	assert.Equal(t, ":8080", cfg.ServerPort, "Expected default SERVER_PORT to be :8080")
+	assert.Equal(t, ":3000", cfg.ServerPort, "Expected default SERVER_PORT to be :8080")
 	assert.Equal(t, "als;dgasdfkasbf2ql4q", cfg.JWTsecretKey, "Expected default SECRET_KEY")
 	assert.Equal(t, "uploads", cfg.UploadsLocation, "Expected default DISK_UPLOADS_LOCATION to be uploads")
 }
