@@ -9,6 +9,7 @@ import (
 	"github.com/fmich7/fyle/pkg/types"
 )
 
+// CreateUser creates a new user and stores it in the database
 func (s *Server) CreateUser(username, password string) error {
 	// check if user already exists
 	if _, err := s.store.RetrieveUser(username); err != nil {
@@ -23,6 +24,7 @@ func (s *Server) CreateUser(username, password string) error {
 	return s.store.StoreUser(acc)
 }
 
+// HandleSignUp handles sign up request
 func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/fmich7/fyle/pkg/config"
@@ -12,16 +11,27 @@ import (
 
 func main() {
 	cfg := new(config.Config)
-	cfg.LoadConfig("example_server.env")
+	cfg.LoadConfig("cmd/server/example_server.env")
 
+	// Setup user storage
+	userStorage, err := storage.NewPQUserStorage(cfg.PostgresCredentials)
+	if err != nil {
+		log.Fatalf("error connecting to user db: %v\n", err)
+	}
+	defer userStorage.CloseDatabase()
+	if err := userStorage.RunMigrations(cfg.MigrationPath); err != nil {
+		log.Fatalf("error running migrations: %v\n", err)
+	}
+
+	// Setup file storage
 	fileStorage, err := storage.NewDiskFileStorage(cfg.UploadsLocation, afero.NewOsFs())
 	if err != nil {
 		log.Fatalf("error creating disk storage: %v\n", err)
 	}
-	serverStorage := storage.NewServerStorage(fileStorage, nil)
 
+	serverStorage := storage.NewServerStorage(fileStorage, userStorage)
 	server := server.NewServer(cfg, serverStorage)
 
-	fmt.Println("Server listening on port", cfg.ServerPort)
+	log.Println("Server listening on port", cfg.ServerPort)
 	log.Fatal(server.Start())
 }
