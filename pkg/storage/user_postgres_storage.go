@@ -53,17 +53,52 @@ func (d *PQUserStorage) CloseDatabase() error {
 
 // StoreUser stores a user in the database
 func (d *PQUserStorage) StoreUser(user *auth.User) error {
+	existQuery := `
+	SELECT EXISTS (
+		SELECT 1 FROM users WHERE username = $1
+	)
+	`
+	var exists bool
+	err := d.db.QueryRow(existQuery, user.Username).Scan(&exists)
+
+	if err != nil {
+		return fmt.Errorf("database error: %v", err)
+	}
+
+	if exists {
+		return errors.New("user already exists")
+	}
+
+	// insert new user into db
+	insertQuery := `
+	INSERT INTO users (username, password)
+	VALUES ($1, $2)
+	`
+	_, err = d.db.Exec(insertQuery, user.Username, user.Password)
+	if err != nil {
+		return fmt.Errorf("inserting user: %v", err)
+	}
+
 	return nil
 }
 
 // RetrieveUser retrieves a user from the database
 func (d *PQUserStorage) RetrieveUser(username string) (*auth.User, error) {
-	if username == "admin" {
-		return nil, errors.New("that user exists already")
+	user := new(auth.User)
+	getUserQuery := `
+	SELECT id, username, password
+	FROM users
+	WHERE username = $1
+	`
+	err := d.db.QueryRow(getUserQuery, username).Scan(&user.ID, &user.Username, &user.Password)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.New("user not found")
+		}
+		return nil, fmt.Errorf("retrieving user: %v", err)
 	}
 
-	// just for now
-	return auth.NewUser(username, "admin")
+	return user, nil
 }
 
 // RunMigrations runs all migrations in the given directory
