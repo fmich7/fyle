@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/fmich7/fyle/pkg/auth"
@@ -31,14 +32,16 @@ func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	// get info from request
 	var usrRequest types.LoginUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&usrRequest); err != nil {
-		http.Error(w, "Error decoding request body", http.StatusBadRequest)
+		log.Println(err)
+		http.Error(w, "error decoding request body", http.StatusBadRequest)
 		return
 	}
 
 	// login user
 	token, err := s.LoginUser(usrRequest.Username, usrRequest.Password)
 	if err != nil {
-		http.Error(w, "Error invalid credentials", http.StatusUnauthorized)
+		log.Println(err)
+		http.Error(w, "error invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
