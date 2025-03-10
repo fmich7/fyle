@@ -24,7 +24,7 @@ func TestHandleSignUp(t *testing.T) {
 	mockServer := server.NewServer(cfg, db)
 
 	// Invalid signup request
-	requestBody, err := json.Marshal(types.CreateUserRequest{
+	requestBody, err := json.Marshal(types.AuthUserRequest{
 		Username: "",
 		Password: "password123",
 	})

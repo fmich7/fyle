@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -10,10 +11,13 @@ import (
 
 // CliClient is the client type for the cli
 type CliClient struct {
-	rootCmd     *cobra.Command
-	fs          afero.Fs
-	UploadURL   string
-	DownloadURL string
+	rootCmd            *cobra.Command
+	fs                 afero.Fs
+	UploadURL          string
+	DownloadURL        string
+	LoginURL           string
+	KeyRingName        string
+	RequestTimeoutTime time.Duration
 }
 
 // NewCliClient creates a new CliClient object
@@ -26,11 +30,13 @@ func NewCliClient(fs afero.Fs) *CliClient {
 		fs: fs,
 
 		// TODO: CONFIG!!!!!
-		UploadURL:   "http://localhost:3000/file",
-		DownloadURL: "http://localhost:3000/getfile",
+		UploadURL:          "http://localhost:3000/file",
+		DownloadURL:        "http://localhost:3000/getfile",
+		LoginURL:           "http://localhost:3000/login",
+		KeyRingName:        "fyle",
+		RequestTimeoutTime: 10 * time.Second,
 	}
 
-	// Attaches commands to the client
 	client.attachCommands()
 
 	return client
@@ -43,7 +49,9 @@ func (c *CliClient) Execute() {
 	}
 }
 
+// Attaches commands to the client
 func (c *CliClient) attachCommands() {
 	c.rootCmd.AddCommand(c.NewUploadCmd())
 	c.rootCmd.AddCommand(c.NewDownloadCmd())
+	c.rootCmd.AddCommand(c.NewLoginCmd())
 }
