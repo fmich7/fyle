@@ -14,7 +14,6 @@ import (
 // GetBaseDir returns absolute path without filename (parent folder)
 func GetBaseDir(path string) (string, error) {
 	absPath, err := filepath.Abs(path)
-	fmt.Println(absPath)
 	if err != nil {
 		return "", err
 	}
@@ -142,14 +141,14 @@ func SaveFileOnDisk(fs afero.Fs, path, filename string, content io.ReadCloser) e
 	// Create the new file
 	file, err := fs.Create(newFilePath)
 	if err != nil {
-		return err
+		return errors.New("creating file on disk")
 	}
 	defer file.Close()
 
 	// Copy the content to the file
 	_, err = io.Copy(file, content)
 	if err != nil {
-		return err
+		return errors.New("copying data to file")
 	}
 
 	return nil

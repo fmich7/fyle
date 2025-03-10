@@ -14,7 +14,6 @@ type CliClient struct {
 	fs          afero.Fs
 	UploadURL   string
 	DownloadURL string
-	User        string
 }
 
 // NewCliClient creates a new CliClient object
@@ -29,7 +28,6 @@ func NewCliClient(fs afero.Fs) *CliClient {
 		// TODO: CONFIG!!!!!
 		UploadURL:   "http://localhost:3000/file",
 		DownloadURL: "http://localhost:3000/getfile",
-		User:        "fmich7",
 	}
 
 	// Attaches commands to the client
@@ -41,7 +39,7 @@ func NewCliClient(fs afero.Fs) *CliClient {
 // Execute runs the root command
 func (c *CliClient) Execute() {
 	if err := c.rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "error executing cli: %v\n", err)
+		fmt.Fprintf(os.Stderr, "error executing cli: %v", err)
 	}
 }
 

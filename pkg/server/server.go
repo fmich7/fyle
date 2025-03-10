@@ -26,12 +26,12 @@ func NewServer(cfg *config.Config, store storage.Storage) *Server {
 // Start starts the server
 func (s *Server) Start() error {
 	// File related routes
-	http.HandleFunc("POST /file", s.HandleFileUpload)
-	http.HandleFunc("POST /getfile", s.HandleFileDownload)
+	http.HandleFunc("POST /file", s.AuthMiddleware(s.HandleFileUpload))
+	http.HandleFunc("POST /getfile", s.AuthMiddleware(s.HandleFileDownload))
 
 	// User related routes
 	http.HandleFunc("POST /signup", s.HandleSignUp)
-	http.HandleFunc("POST /login", s.HandleLogin)
+	http.HandleFunc("GET /login", s.HandleLogin)
 
 	return http.ListenAndServe(s.listenAddr, nil)
 }

@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -28,7 +29,7 @@ func (c *CliClient) NewUploadCmd() *cobra.Command {
 			}
 
 			if err := c.UploadFile(localPath, serverPath); err != nil {
-				fmt.Fprintf(cmd.ErrOrStderr(), "error uploading file: %v\n", err)
+				fmt.Fprintf(cmd.ErrOrStderr(), "error uploading file: %v", err)
 			}
 		},
 	}
@@ -43,38 +44,47 @@ func (c *CliClient) UploadFile(localPath, serverPath string) error {
 	defer file.Close()
 
 	// Create a buffer to store multipart form data
-	form, err := PrepareMultipartForm(file, localPath, serverPath, c.User)
+	form, err := PrepareMultipartForm(file, localPath, serverPath)
 	if err != nil {
 		return err
 	}
 
 	// Create request and set headers
-	resp, err := http.Post(c.UploadURL, form.FormDataContentType, form.FormData)
+	req, err := http.NewRequest("POST", c.UploadURL, form.FormData)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.getJWTToken()))
+	req.Header.Set("Content-Type", form.FormDataContentType)
 	if err != nil {
 		return fmt.Errorf("creating request: %v", err)
 	}
-	defer resp.Body.Close()
 
+	client := http.Client{
+		Timeout: RequestTimeoutTime,
+	}
+
+	// Send request
+	res, err := client.Do(req)
+	if err != nil {
+		return errors.New("impossible to send a request")
+	}
+
+	defer res.Body.Close()
 	// Check if request was successful
-	if resp.StatusCode != http.StatusCreated {
-		return fmt.Errorf("uploading file: %v", resp.Status)
+	if res.StatusCode != http.StatusCreated {
+		return fmt.Errorf("uploading file: %v", res.Status)
 	}
 
 	// Print response
-	respBody, _ := io.ReadAll(resp.Body)
+	respBody, _ := io.ReadAll(res.Body)
 	fmt.Println("Server Response:", string(respBody))
 
 	return nil
 }
 
-func PrepareMultipartForm(file afero.File, localPath, serverPath, user string) (*types.MultiPartForm, error) {
+func PrepareMultipartForm(file afero.File, localPath, serverPath string) (*types.MultiPartForm, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	defer writer.Close()
 
-	if err := writer.WriteField("user", user); err != nil {
-		return nil, err
-	}
 	if err := writer.WriteField("path", serverPath); err != nil {
 		return nil, err
 	}

@@ -24,6 +24,6 @@ var (
 // Execute runs the root command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "error on executing cli: %s\n", err)
+		fmt.Fprintf(os.Stderr, "error on executing cli: %v", err)
 	}
 }
