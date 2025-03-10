@@ -15,7 +15,7 @@ import (
 // NewDownloadCmd creates a new download command
 func (c *CliClient) NewDownloadCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "download [serverPath] [localPath",
+		Use:   "download [serverPath] [localPath]",
 		Short: "Downloads a file from server and stores it in given location",
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {

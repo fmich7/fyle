@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"bytes"
+	"context"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -49,6 +50,9 @@ func TestHandleFileUpload(t *testing.T) {
 	mockServer := server.NewServer(utils.NewTestingConfig(), storage)
 
 	// Call handler
+	ctx := context.WithValue(req.Context(), "username", "test")
+	req = req.WithContext(ctx)
+
 	mockServer.HandleFileUpload(recorder, req)
 
 	// Check response

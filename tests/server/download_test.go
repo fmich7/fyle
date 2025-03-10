@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -19,58 +20,50 @@ import (
 func TestHandleFileDownload(t *testing.T) {
 	assert := assert.New(t)
 
-	// create storage and mock file
+	// data and fake storage
 	filename := "tempfile.txt"
 	user := "user"
 	content := []byte("some content")
-
-	// storage
 	afs := afero.NewMemMapFs()
 	storage, err := utils.NewTestingStorage(afs)
 	require.NoError(t, err, "Expected no error creating storage")
 
+	// create mock file
 	fileServerPath := filepath.Join(storage.GetFileUploadsLocation(), user, filename)
-	afero.WriteFile(afs, fileServerPath, content, 0777)
+	require.NoError(t, afero.WriteFile(afs, fileServerPath, content, 0777), "Expected no error writing file")
 
-	// server
+	// create server
 	server := server.NewServer(utils.NewTestingConfig(), storage)
-	t.Log(storage.GetFileUploadsLocation())
-	// request
-	body := new(bytes.Buffer)
-	err = json.NewEncoder(body).Encode(types.DownloadRequest{
-		Path: filename,
-	})
-	assert.NoError(err, "Expected no error with marshalling data")
 
-	// TEST: send request and validate if file matches
-	req := httptest.NewRequest("POST", "/getfile", body)
-	req.Header.Set("Content-Type", "application/json")
-	response := httptest.NewRecorder()
-	server.HandleFileDownload(response, req)
+	// sendRequest with injected username
+	sendRequest := func(t *testing.T, path string) *httptest.ResponseRecorder {
+		t.Helper()
+		body := new(bytes.Buffer)
+		require.NoError(t, json.NewEncoder(body).Encode(types.DownloadRequest{Path: path}), "Expected no error marshalling request data")
 
-	data := response.Body.Bytes()
-	assert.Equal(http.StatusOK, response.Code, string(data))
-	assert.Equal(content, data, "Expected file content to be the same")
+		req := httptest.NewRequest("POST", "/getfile", body)
+		req.Header.Set("Content-Type", "application/json")
 
-	// TEST: send request to get file that does not exists
-	err = json.NewEncoder(body).Encode(types.DownloadRequest{
-		Path: "DFHJADFKLJADJFDKLFLJKJKLF.txt",
-	})
-	assert.NoError(err, "Expected no error with marshalling data")
+		// Inject username into request context
+		ctx := context.WithValue(req.Context(), "username", user)
+		req = req.WithContext(ctx)
 
-	req = httptest.NewRequest("POST", "/getfile", body)
-	response = httptest.NewRecorder()
-	server.HandleFileDownload(response, req)
-	assert.Equal(http.StatusBadRequest, response.Code, string(data))
+		rec := httptest.NewRecorder()
+		server.HandleFileDownload(rec, req)
 
-	// TEST: invalid path
-	err = json.NewEncoder(body).Encode(types.DownloadRequest{
-		Path: "../../../file.txt",
-	})
-	assert.NoError(err, "Expected no error with marshalling data")
+		return rec
+	}
 
-	req = httptest.NewRequest("POST", "/getfile", body)
-	response = httptest.NewRecorder()
-	server.HandleFileDownload(response, req)
-	assert.Equal(http.StatusBadRequest, response.Code, string(data))
+	// TEST: Valid file download
+	response := sendRequest(t, filename)
+	assert.Equal(http.StatusOK, response.Code, string(response.Body.Bytes()))
+	assert.Equal(content, response.Body.Bytes(), "Expected file content to be the same")
+
+	// TEST: Request for non-existent file
+	response = sendRequest(t, "DFHJADFKLJADJFDKLFLJKJKLF.txt")
+	assert.Equal(http.StatusBadRequest, response.Code, "Expected bad request for missing file")
+
+	// TEST: Invalid file path (path traversal attack)
+	response = sendRequest(t, "../../../file.txt")
+	assert.Equal(http.StatusBadRequest, response.Code, "Expected bad request for invalid path")
 }

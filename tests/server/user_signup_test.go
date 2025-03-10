@@ -38,5 +38,5 @@ func TestHandleSignUp(t *testing.T) {
 	mockServer.HandleSignUp(rec, req)
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
-	assert.Contains(t, rec.Body.String(), "error length of passed username/password is 0")
+	assert.Contains(t, rec.Body.String(), "length of passed username/password is 0")
 }
