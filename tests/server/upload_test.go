@@ -7,9 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/fmich7/fyle/pkg/config"
 	"github.com/fmich7/fyle/pkg/server"
-	"github.com/fmich7/fyle/pkg/storage"
+	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
@@ -43,11 +42,11 @@ func TestHandleFileUpload(t *testing.T) {
 
 	// Create mock server instance with a mock store
 	afs := afero.NewMemMapFs()
-	storage, err := storage.NewTestingStorage(afs)
+	storage, err := utils.NewTestingStorage(afs)
 	if err != nil {
 		t.Fatal(err)
 	}
-	mockServer := server.NewServer(config.NewTestingConfig(), storage)
+	mockServer := server.NewServer(utils.NewTestingConfig(), storage)
 
 	// Call handler
 	mockServer.HandleFileUpload(recorder, req)

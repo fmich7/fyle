@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/fmich7/fyle/pkg/utils"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -225,32 +226,31 @@ func TestGetFileNameFromContentDisposition(t *testing.T) {
 
 func TestSaveFileOnDisk(t *testing.T) {
 	assert := assert.New(t)
+	afs := afero.NewMemMapFs()
 
-	// Create a temporary directory
-	tempDir := t.TempDir()
+	// Create a temporary directory in afero
+	tempDir := "/temp"
 	filename := "testttt.txt"
 	path := filepath.Join(tempDir, filename)
 	content := []byte("mega content")
 	contentReader := io.NopCloser(bytes.NewReader(content))
 
 	// Test: should be created successfully
-	err := utils.SaveFileOnDisk(tempDir, filename, contentReader)
+	err := utils.SaveFileOnDisk(afs, tempDir, filename, contentReader)
 	assert.NoError(err, "Expected no error when saving file that doesn't exist")
 
-	// Verify that file is indeed created
-	_, err = os.Stat(path)
-	assert.NoError(err, "Expected file to be created")
+	// Verify that file is indeed created in the in-memory filesystem
+	exists, err := afero.Exists(afs, path)
+	assert.NoError(err)
+	assert.True(exists, "Expected file to be created")
 
 	// Test: should return error when file already exists
 	contentReader = io.NopCloser(bytes.NewReader(content))
-	err = utils.SaveFileOnDisk(tempDir, filename, contentReader)
+	err = utils.SaveFileOnDisk(afs, tempDir, filename, contentReader)
 	assert.Error(err, "Expected error when saving file that already exists")
 
-	// Test: does file content match??
-	file, err := os.ReadFile(path)
-	assert.NoError(err, "Failed to read file")
+	// Test: does file content match?
+	file, err := afero.ReadFile(afs, path)
+	assert.NoError(err, "Failed to read file from afero")
 	assert.Equal(content, file, "File content does not match")
-
-	err = os.RemoveAll(path)
-	assert.NoError(err, "Failed to do a cleanup")
 }

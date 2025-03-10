@@ -2,23 +2,12 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/fmich7/fyle/pkg/auth"
 	"github.com/fmich7/fyle/pkg/types"
 )
-
-// CreateUser creates a new user and stores it in the database
-func (s *Server) CreateUser(username, password string) error {
-	acc, err := auth.NewUser(username, password)
-	if err != nil {
-		return fmt.Errorf("creating user: %v", err)
-	}
-
-	return s.store.StoreUser(acc)
-}
 
 // HandleSignUp handles sign up request
 func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
@@ -33,9 +22,17 @@ func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create new user
-	if err := s.CreateUser(usrRequest.Username, usrRequest.Password); err != nil {
+	user, err := auth.NewUser(usrRequest.Username, usrRequest.Password)
+	if err != nil {
 		log.Println(err)
-		http.Error(w, "error creating an account", http.StatusInternalServerError)
+		http.Error(w, "error length of passed username/password is 0", http.StatusBadRequest)
+		return
+	}
+
+	// Store user
+	if err := s.store.StoreUser(user); err != nil {
+		log.Println(err)
+		http.Error(w, "error couldn't store user on a server", http.StatusInternalServerError)
 		return
 	}
 

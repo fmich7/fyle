@@ -20,7 +20,7 @@ func CreateToken(secret, username string) (string, error) {
 // ValidateToken validates given token
 func ValidateToken(secret, tokenString string) error {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-		return secret, nil
+		return []byte(secret), nil
 	})
 
 	if err != nil {

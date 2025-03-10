@@ -81,7 +81,7 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	}
 
 	// Save file on disk
-	err = utils.SaveFileOnDisk(localPath, filename, res.Body)
+	err = utils.SaveFileOnDisk(c.fs, localPath, filename, res.Body)
 	if err != nil {
 		return errors.New("couldn't save file on disk")
 	}

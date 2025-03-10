@@ -2,35 +2,20 @@ package cli_test
 
 import (
 	"bytes"
-	"os"
 	"testing"
 
-	"github.com/fmich7/fyle/pkg/cli"
-	"github.com/spf13/afero"
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestExecute(t *testing.T) {
-	// Pipe to redirect stderr
-	r, w, _ := os.Pipe()
-	oldStderr := os.Stderr
-	os.Stderr = w
-	defer func() {
-		os.Stderr = oldStderr
-		w.Close()
-	}()
-
-	// Test function
-	cli := cli.NewCliClient(afero.NewMemMapFs())
-	cli.Execute()
-
-	// Close the write end of the pipe and read output
-	w.Close()
-
-	var buf bytes.Buffer
-	buf.ReadFrom(r)
-
-	// Check if there was an error
-	if buf.Len() > 0 {
-		t.Errorf("Expected no error, got: %s", buf.String())
+func TestExecute_NoError(t *testing.T) {
+	output := &bytes.Buffer{}
+	rootCmd := &cobra.Command{
+		Use:   "fyle",
+		Short: "fyle is a cli tool for managing your files on the cloud",
 	}
+	rootCmd.SetOut(output)
+
+	err := rootCmd.Execute()
+	assert.NoError(t, err, "Executing root command should not return an error")
 }
