@@ -28,11 +28,6 @@ func TestGetEnv(t *testing.T) {
 	assert.NoError(t, err, "setting env %s", key)
 }
 
-func TestNewTestingConfig(t *testing.T) {
-	cfg := NewTestingConfig()
-	assert.Equal(t, cfg.ServerPort, ":0")
-}
-
 func TestLoadConfig(t *testing.T) {
 	tmpDir := t.TempDir()
 

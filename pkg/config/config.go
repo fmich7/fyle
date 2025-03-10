@@ -53,10 +53,3 @@ func getPostgresCredentials() types.PostgresCredentials {
 		DB_PORT:     getEnv("POSTGRES_PORT", "5432"),
 	}
 }
-
-// NewTestingConfig return config that is used for testing
-func NewTestingConfig() *Config {
-	return &Config{
-		ServerPort: ":0",
-	}
-}

@@ -1,6 +1,10 @@
 package auth
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"errors"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 // User type
 type User struct {
@@ -11,15 +15,17 @@ type User struct {
 
 // NewUser creates new user with hashed password
 func NewUser(username, password string) (*User, error) {
+	if len(username) == 0 || len(password) == 0 {
+		return nil, errors.New("empty credentials")
+	}
+
 	// hash password
 	hashedPassword, err := hashPassword(password)
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: auto id
 	return &User{
-		ID:       0,
 		Username: username,
 		Password: hashedPassword,
 	}, nil

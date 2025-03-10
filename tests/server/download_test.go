@@ -8,10 +8,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/fmich7/fyle/pkg/config"
 	"github.com/fmich7/fyle/pkg/server"
-	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,14 +26,14 @@ func TestHandleFileDownload(t *testing.T) {
 
 	// storage
 	afs := afero.NewMemMapFs()
-	storage, err := storage.NewTestingStorage(afs)
+	storage, err := utils.NewTestingStorage(afs)
 	require.NoError(t, err, "Expected no error creating storage")
 
 	fileServerPath := filepath.Join(storage.GetFileUploadsLocation(), user, filename)
 	afero.WriteFile(afs, fileServerPath, content, 0777)
 
 	// server
-	server := server.NewServer(config.NewTestingConfig(), storage)
+	server := server.NewServer(utils.NewTestingConfig(), storage)
 	t.Log(storage.GetFileUploadsLocation())
 	// request
 	body := new(bytes.Buffer)
