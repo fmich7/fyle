@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/fmich7/fyle/pkg/types"
@@ -16,11 +15,9 @@ import (
 // NewDownloadCmd creates a new download command
 func (c *CliClient) NewDownloadCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "download",
-		Short: "Downloads a file from server",
-		Long: "As of now, only single file download is supported\n" +
-			"Usage: fyle download <serverPath> <localPath>",
-		Args: cobra.MinimumNArgs(1),
+		Use:   "download [serverPath] [localPath",
+		Short: "Downloads a file from server and stores it in given location",
+		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			serverPath := args[0]
 			localPath := "."
@@ -61,16 +58,20 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 		return errors.New("couldn't construct a request")
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.getJWTToken()))
+
+	jwtToken, err := c.getJWTToken()
+	if err != nil {
+		return errors.New("failed to get authorization credentials")
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwtToken))
 
 	client := http.Client{
-		Timeout: RequestTimeoutTime,
+		Timeout: c.RequestTimeoutTime,
 	}
 
 	// Send request
 	res, err := client.Do(req)
 	if err != nil {
-		log.Println(err)
 		return errors.New("impossible to send a request")
 	}
 	defer res.Body.Close()

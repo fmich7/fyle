@@ -56,7 +56,7 @@ func TestHandleLogin(t *testing.T) {
 	mockServer := server.NewServer(cfg, db)
 
 	// invalid credentials
-	requestBody, err := json.Marshal(types.LoginUserRequest{
+	requestBody, err := json.Marshal(types.AuthUserRequest{
 		Username: "testuser",
 		Password: "wrongpassword",
 	})
@@ -80,7 +80,7 @@ func TestHandleLogin(t *testing.T) {
 	require.NoError(t, err, "creating user")
 	db.StoreUser(newUser)
 
-	requestBodyValid, err := json.Marshal(types.LoginUserRequest{
+	requestBodyValid, err := json.Marshal(types.AuthUserRequest{
 		Username: username,
 		Password: password,
 	})

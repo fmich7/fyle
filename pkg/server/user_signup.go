@@ -14,7 +14,7 @@ func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	// get info from request
-	var usrRequest types.CreateUserRequest
+	var usrRequest types.AuthUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&usrRequest); err != nil {
 		log.Println(err)
 		http.Error(w, "error decoding request body", http.StatusBadRequest)
