@@ -19,7 +19,7 @@ func TestNewDownloadCmd_ValidArgs(t *testing.T) {
 
 	cmd := client.NewDownloadCmd()
 	require.NotNil(t, cmd)
-	assert.Equal(t, "download", cmd.Use)
+	assert.Equal(t, "download [serverPath] [localPath]", cmd.Use)
 }
 
 func TestDownloadFile_Success(t *testing.T) {

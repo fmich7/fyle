@@ -18,7 +18,7 @@ func TestNewUploadCmd_ValidArgs(t *testing.T) {
 
 	cmd := client.NewUploadCmd()
 	require.NotNil(t, cmd)
-	assert.Equal(t, "upload", cmd.Use)
+	assert.Equal(t, "upload [localPath] [serverPath]", cmd.Use)
 }
 
 // Mock server for handling file uploads
@@ -29,7 +29,7 @@ func mockUploadServer(expectedStatus int) *httptest.Server {
 			return
 		}
 		w.WriteHeader(expectedStatus)
-		w.Write([]byte(`{"message": "File uploaded successfully"}`))
+		w.Write([]byte("File uploaded successfully"))
 	})
 	return httptest.NewServer(handler)
 }
@@ -62,7 +62,7 @@ func TestUploadFile_FailedRequest(t *testing.T) {
 
 	err := client.UploadFile(filePath, "/server/path/")
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "creating request")
+	assert.Contains(t, err.Error(), "impossible to send a request")
 }
 
 // TestUploadFile_FormCreationError error in multipart form creation
