@@ -39,7 +39,6 @@ func TestHandleFileDownload(t *testing.T) {
 	body := new(bytes.Buffer)
 	err = json.NewEncoder(body).Encode(types.DownloadRequest{
 		Path: filename,
-		User: user,
 	})
 	assert.NoError(err, "Expected no error with marshalling data")
 
@@ -56,7 +55,6 @@ func TestHandleFileDownload(t *testing.T) {
 	// TEST: send request to get file that does not exists
 	err = json.NewEncoder(body).Encode(types.DownloadRequest{
 		Path: "DFHJADFKLJADJFDKLFLJKJKLF.txt",
-		User: user,
 	})
 	assert.NoError(err, "Expected no error with marshalling data")
 
@@ -68,7 +66,6 @@ func TestHandleFileDownload(t *testing.T) {
 	// TEST: invalid path
 	err = json.NewEncoder(body).Encode(types.DownloadRequest{
 		Path: "../../../file.txt",
-		User: user,
 	})
 	assert.NoError(err, "Expected no error with marshalling data")
 

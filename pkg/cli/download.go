@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/fmich7/fyle/pkg/types"
@@ -34,9 +35,9 @@ func (c *CliClient) NewDownloadCmd() *cobra.Command {
 			}
 
 			if err = c.DownloadFile(serverPath, localPath); err != nil {
-				fmt.Fprintln(cmd.ErrOrStderr(), err)
+				fmt.Fprintln(cmd.ErrOrStderr(), fmt.Errorf("error: %v", err))
 			} else {
-				fmt.Fprintf(cmd.OutOrStdout(), "File saved at %s\n", localPath)
+				fmt.Fprintf(cmd.OutOrStdout(), "File saved at %s", localPath)
 			}
 		},
 	}
@@ -46,7 +47,6 @@ func (c *CliClient) NewDownloadCmd() *cobra.Command {
 func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	data := types.DownloadRequest{
 		Path: serverPath,
-		User: c.User,
 	}
 
 	// Marshall request data
@@ -61,6 +61,7 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 		return errors.New("couldn't construct a request")
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.getJWTToken()))
 
 	client := http.Client{
 		Timeout: RequestTimeoutTime,
@@ -69,6 +70,7 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	// Send request
 	res, err := client.Do(req)
 	if err != nil {
+		log.Println(err)
 		return errors.New("impossible to send a request")
 	}
 	defer res.Body.Close()
@@ -83,7 +85,7 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	// Save file on disk
 	err = utils.SaveFileOnDisk(c.fs, localPath, filename, res.Body)
 	if err != nil {
-		return errors.New("couldn't save file on disk")
+		return err
 	}
 
 	return nil

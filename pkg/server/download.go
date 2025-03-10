@@ -14,9 +14,7 @@ import (
 // HandleFileDownload handles the file download request
 func (s *Server) HandleFileDownload(w http.ResponseWriter, r *http.Request) {
 	log.Println("Downloading file")
-
-	// TODO: Auth check
-	// GET USER FROM AUTH-HEADER!!!!!!!!!!!1
+	username := r.Context().Value("username").(string)
 
 	// Get file path from the request
 	var reqBody types.DownloadRequest
@@ -31,7 +29,7 @@ func (s *Server) HandleFileDownload(w http.ResponseWriter, r *http.Request) {
 	// Check if file exists on a server
 	path, valid := utils.GetLocationOnServer(
 		s.store.GetFileUploadsLocation(),
-		reqBody.User,
+		username,
 		reqBody.Path,
 		"", // path already contains a filename
 	)

@@ -11,14 +11,9 @@ import (
 // HandleFileUpload handles the file upload request
 func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	log.Println("Uploading file")
-	r.ParseMultipartForm(10 << 20) // 10 MB max size
 
-	// Get user from the request
-	user := r.FormValue("user")
-	if user == "" {
-		http.Error(w, "User not provided", http.StatusBadRequest)
-		return
-	}
+	r.ParseMultipartForm(10 << 20) // 10 MB max size
+	username := r.Context().Value("username").(string)
 
 	// Retrieve the file from the request
 	fileData, fileMetadata, err := r.FormFile("file")
@@ -32,7 +27,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	userInputPath := r.FormValue("path")
 	safePath, valid := utils.GetLocationOnServer(
 		s.store.GetFileUploadsLocation(),
-		user,
+		username,
 		userInputPath,
 		fileMetadata.Filename,
 	)
@@ -43,7 +38,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create new file object and upload it to the storage
-	file := types.NewFile(fileMetadata, fileData, user, safePath)
+	file := types.NewFile(fileMetadata, fileData, username, safePath)
 	if err := s.store.StoreFile(file); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
