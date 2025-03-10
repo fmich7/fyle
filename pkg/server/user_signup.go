@@ -17,7 +17,7 @@ func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	var usrRequest types.AuthUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&usrRequest); err != nil {
 		log.Println(err)
-		http.Error(w, "error decoding request body", http.StatusBadRequest)
+		http.Error(w, "failed to decode request body", http.StatusBadRequest)
 		return
 	}
 
@@ -25,14 +25,14 @@ func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.NewUser(usrRequest.Username, usrRequest.Password)
 	if err != nil {
 		log.Println(err)
-		http.Error(w, "error length of passed username/password is 0", http.StatusBadRequest)
+		http.Error(w, "length of passed username/password is 0", http.StatusBadRequest)
 		return
 	}
 
 	// Store user
 	if err := s.store.StoreUser(user); err != nil {
 		log.Println(err)
-		http.Error(w, "error couldn't store user on a server", http.StatusInternalServerError)
+		http.Error(w, "failed to store user on a server", http.StatusInternalServerError)
 		return
 	}
 

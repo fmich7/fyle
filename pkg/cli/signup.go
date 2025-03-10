@@ -12,26 +12,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewLogin creates a new login command
-func (c *CliClient) NewLoginCmd() *cobra.Command {
+// NewSignUPCmd creates a new sign up command
+func (c *CliClient) NewSignUPCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "login [username] [password]",
-		Short: "Login into your account",
+		Use:   "signup [username] [password]",
+		Short: "Create a new account on fyle platform",
 		Args:  cobra.MinimumNArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
 			username := args[0]
 			password := args[1]
-			if err := c.LoginUser(username, password); err != nil {
+			if err := c.SignUPUser(username, password); err != nil {
 				fmt.Fprintf(cmd.ErrOrStderr(), "error: %v", err)
 			} else {
-				fmt.Fprintf(cmd.OutOrStdout(), "Logged in successfully!")
+				fmt.Fprintf(cmd.OutOrStdout(), "Created new account successfully!")
 			}
 		},
 	}
 }
 
-// LoginUser sends given credentials to server in order to receive and store JWT
-func (c *CliClient) LoginUser(username, password string) error {
+// SignUPUser sends given information to the server to sign up new user
+func (c *CliClient) SignUPUser(username, password string) error {
 	if username == "" {
 		return errors.New("username argument is empty")
 	} else if password == "" {
@@ -47,7 +47,7 @@ func (c *CliClient) LoginUser(username, password string) error {
 		return errors.New("failed to create request body")
 	}
 
-	req, err := http.NewRequest("GET", c.LoginURL, body)
+	req, err := http.NewRequest("POST", c.SignupURL, body)
 	if err != nil {
 		return errors.New("failed to construct request")
 	}
@@ -68,13 +68,8 @@ func (c *CliClient) LoginUser(username, password string) error {
 	}
 
 	// Is resp good?
-	if res.StatusCode != http.StatusOK {
+	if res.StatusCode != http.StatusCreated {
 		return errors.New(string(msg))
-	}
-
-	err = c.setJWTToken(string(msg))
-	if err != nil {
-		return err
 	}
 
 	return nil
