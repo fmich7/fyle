@@ -16,6 +16,7 @@ type CliClient struct {
 	UploadURL          string
 	DownloadURL        string
 	LoginURL           string
+	ListFilesURL       string
 	SignupURL          string
 	KeyRingName        string
 	RequestTimeoutTime time.Duration
@@ -35,6 +36,7 @@ func NewCliClient(fs afero.Fs) *CliClient {
 		DownloadURL:        "http://localhost:3000/getfile",
 		LoginURL:           "http://localhost:3000/login",
 		SignupURL:          "http://localhost:3000/signup",
+		ListFilesURL:       "http://localhost:3000/ls",
 		KeyRingName:        "fyle",
 		RequestTimeoutTime: 10 * time.Second,
 	}
@@ -57,4 +59,5 @@ func (c *CliClient) attachCommands() {
 	c.rootCmd.AddCommand(c.NewDownloadCmd())
 	c.rootCmd.AddCommand(c.NewLoginCmd())
 	c.rootCmd.AddCommand(c.NewSignUPCmd())
+	c.rootCmd.AddCommand(c.NewListTreeCmd())
 }

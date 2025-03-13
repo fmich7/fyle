@@ -10,3 +10,8 @@ type AuthUserRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+
+// ListFilesRequest contains data that is used to list files in user's dir
+type ListFilesRequest struct {
+	Path string `json:"path"`
+}

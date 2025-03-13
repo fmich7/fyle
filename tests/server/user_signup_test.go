@@ -7,9 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/fmich7/fyle/pkg/config"
 	"github.com/fmich7/fyle/pkg/server"
+	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/fmich7/fyle/pkg/types"
-	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,10 +18,10 @@ import (
 
 func TestHandleSignUp(t *testing.T) {
 	afs := afero.NewMemMapFs()
-	db, err := utils.NewTestingStorage(afs)
+	db, err := storage.NewTestingStorage(afs)
 	require.NoError(t, err, "initializing db")
 
-	cfg := utils.NewTestingConfig()
+	cfg := config.NewTestingConfig()
 	mockServer := server.NewServer(cfg, db)
 
 	// Invalid signup request
