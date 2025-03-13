@@ -28,6 +28,7 @@ func (s *Server) Start() error {
 	// File related routes
 	http.HandleFunc("POST /file", s.AuthMiddleware(s.HandleFileUpload))
 	http.HandleFunc("POST /getfile", s.AuthMiddleware(s.HandleFileDownload))
+	http.HandleFunc("POST /ls", s.AuthMiddleware(s.HandleListFiles))
 
 	// User related routes
 	http.HandleFunc("POST /signup", s.HandleSignUp)

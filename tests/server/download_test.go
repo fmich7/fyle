@@ -9,9 +9,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/fmich7/fyle/pkg/config"
 	"github.com/fmich7/fyle/pkg/server"
+	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/fmich7/fyle/pkg/types"
-	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -25,7 +26,7 @@ func TestHandleFileDownload(t *testing.T) {
 	user := "user"
 	content := []byte("some content")
 	afs := afero.NewMemMapFs()
-	storage, err := utils.NewTestingStorage(afs)
+	storage, err := storage.NewTestingStorage(afs)
 	require.NoError(t, err, "Expected no error creating storage")
 
 	// create mock file
@@ -33,7 +34,7 @@ func TestHandleFileDownload(t *testing.T) {
 	require.NoError(t, afero.WriteFile(afs, fileServerPath, content, 0777), "Expected no error writing file")
 
 	// create server
-	server := server.NewServer(utils.NewTestingConfig(), storage)
+	server := server.NewServer(config.NewTestingConfig(), storage)
 
 	// sendRequest with injected username
 	sendRequest := func(t *testing.T, path string) *httptest.ResponseRecorder {

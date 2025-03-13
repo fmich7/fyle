@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/afero"
 )
 
@@ -91,4 +92,23 @@ func (d *DiskFileStorage) createFile(file *types.File) (afero.File, error) {
 // GetFileUploadsLocation returns the file uploads location
 func (d *DiskFileStorage) GetFileUploadsLocation() string {
 	return d.location
+}
+
+// GetUserFileTree returns string with user's files
+func (d *DiskFileStorage) GetUserFileTree(username, path string) (string, error) {
+	// Get absolute valid path
+	fullPath := utils.JoinPathParts(d.GetFileUploadsLocation(), username, path)
+
+	// Check if valid
+	valid := utils.ValidatePath(d.GetFileUploadsLocation(), fullPath)
+	if !valid {
+		return "", fmt.Errorf("invalid path")
+	}
+
+	treeString, err := utils.GetDirTree(d.fs, fullPath)
+	if err != nil {
+		return "", fmt.Errorf("building tree string %v", err)
+	}
+
+	return treeString, nil
 }

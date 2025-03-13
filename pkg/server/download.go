@@ -19,7 +19,7 @@ func (s *Server) HandleFileDownload(w http.ResponseWriter, r *http.Request) {
 	// Get file path from the request
 	var reqBody types.DownloadRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		http.Error(w, "error decoding request body", http.StatusBadRequest)
+		http.Error(w, "decoding request body", http.StatusBadRequest)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (s *Server) HandleFileDownload(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/octet-stream")
 
 	if _, err := io.Copy(w, fileReader); err != nil {
-		http.Error(w, "error streaming file", http.StatusInternalServerError)
+		http.Error(w, "streaming file", http.StatusInternalServerError)
 		return
 	}
 }
