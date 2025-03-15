@@ -45,10 +45,11 @@ func (c *CliClient) ListFiles(path string) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	jwtToken, err := c.getJWTToken()
+	jwtTokenBytes, err := c.getKeyringValue("jwt_token")
 	if err != nil {
 		return errors.New("failed to get authorization credentials")
 	}
+	jwtToken := string(jwtTokenBytes)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwtToken))
 
 	client := http.Client{
