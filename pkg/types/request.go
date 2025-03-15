@@ -1,5 +1,11 @@
 package types
 
+// LoginResponse contains data that is returned to client after login
+type LoginResponse struct {
+	Token string `json:"token"`
+	Salt  string `json:"salt"`
+}
+
 // DownloadRequest is contains data that server expects from client
 type DownloadRequest struct {
 	Path string `json:"path"`

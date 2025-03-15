@@ -72,7 +72,14 @@ func (c *CliClient) LoginUser(username, password string) error {
 		return errors.New(string(msg))
 	}
 
-	err = c.setJWTToken(string(msg))
+	loginCredentials := new(types.LoginResponse)
+	err = json.Unmarshal(msg, loginCredentials)
+	if err != nil {
+		return errors.New("failed to unmarshal server response")
+	}
+
+	fmt.Printf("%+v\n", loginCredentials)
+	err = c.setJWTToken(loginCredentials.Token)
 	if err != nil {
 		return err
 	}

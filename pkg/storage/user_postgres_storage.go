@@ -71,10 +71,10 @@ func (d *PQUserStorage) StoreUser(user *auth.User) error {
 
 	// insert new user into db
 	insertQuery := `
-	INSERT INTO users (username, password)
-	VALUES ($1, $2)
+	INSERT INTO users (username, password, salt)
+	VALUES ($1, $2, $3)
 	`
-	_, err = d.db.Exec(insertQuery, user.Username, user.Password)
+	_, err = d.db.Exec(insertQuery, user.Username, user.Password, user.Salt)
 	if err != nil {
 		return fmt.Errorf("inserting user: %v", err)
 	}
@@ -86,11 +86,13 @@ func (d *PQUserStorage) StoreUser(user *auth.User) error {
 func (d *PQUserStorage) RetrieveUser(username string) (*auth.User, error) {
 	user := new(auth.User)
 	getUserQuery := `
-	SELECT id, username, password
+	SELECT id, username, password, salt
 	FROM users
 	WHERE username = $1
 	`
-	err := d.db.QueryRow(getUserQuery, username).Scan(&user.ID, &user.Username, &user.Password)
+	err := d.db.QueryRow(getUserQuery, username).Scan(
+		&user.ID, &user.Username, &user.Password, &user.Salt,
+	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, errors.New("user not found")
