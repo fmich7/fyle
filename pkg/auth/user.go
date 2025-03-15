@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"encoding/base64"
 	"errors"
 
+	"github.com/fmich7/fyle/pkg/encryption"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -11,6 +13,7 @@ type User struct {
 	ID       int
 	Username string
 	Password string
+	Salt     string
 }
 
 // NewUser creates new user with hashed password
@@ -25,9 +28,16 @@ func NewUser(username, password string) (*User, error) {
 		return nil, err
 	}
 
+	// generate random salt
+	salt, err := encryption.GenerateRandomSalt()
+	if err != nil {
+		return nil, err
+	}
+
 	return &User{
 		Username: username,
 		Password: hashedPassword,
+		Salt:     base64.StdEncoding.EncodeToString(salt),
 	}, nil
 
 }

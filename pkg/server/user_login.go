@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -11,18 +10,27 @@ import (
 )
 
 // LoginUser return jwt token if user exists and password is correct
-func (s *Server) LoginUser(username, password string) (string, error) {
+func (s *Server) LoginUser(username, password string) (*types.LoginResponse, error) {
 	usr, err := s.store.RetrieveUser(username)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// validate password
 	if err = auth.CheckPassword(usr.Password, password); err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return auth.CreateToken(s.jwtSecretKey, username)
+	// generate token
+	token, err := auth.CreateToken(s.jwtSecretKey, username)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.LoginResponse{
+		Token: token,
+		Salt:  usr.Salt,
+	}, nil
 }
 
 // HandleLogin handles login request and returns jwt token on success
@@ -38,14 +46,25 @@ func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// login user
-	token, err := s.LoginUser(usrRequest.Username, usrRequest.Password)
+	loginCredentials, err := s.LoginUser(usrRequest.Username, usrRequest.Password)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "error invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
-	// send back jwt token
+	// send back token and salt
+	jsonData, err := json.Marshal(types.LoginResponse{
+		Token: loginCredentials.Token,
+		Salt:  loginCredentials.Salt,
+	})
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "error encoding response", http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, token)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
