@@ -29,7 +29,7 @@ func NewUser(username, password string) (*User, error) {
 	}
 
 	// generate random salt
-	salt, err := encryption.GenerateRandomSalt()
+	salt, err := encryption.GenerateRandomNBytes(16)
 	if err != nil {
 		return nil, err
 	}
