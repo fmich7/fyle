@@ -70,6 +70,10 @@ func TestUploadFile_FormCreationError(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	client := cli.NewCliClient(fs)
 
+	server := mockUploadServer(http.StatusCreated)
+	defer server.Close()
+	client.UploadURL = server.URL
+
 	err := client.UploadFile("/nonexistent.txt", "/server/path/")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "opening file")
