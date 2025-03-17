@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/fmich7/fyle/pkg/encryption"
 	"github.com/fmich7/fyle/pkg/types"
 	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/cobra"
@@ -59,6 +60,7 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
+	// Load jwt token from keyring and set it as Authorization header
 	jwtTokenBytes, err := c.getKeyringValue("jwt_token")
 	if err != nil {
 		return errors.New("failed to get authorization credentials")
@@ -81,13 +83,22 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	dispositionHeader := res.Header.Get("Content-Disposition")
 	filename, err := utils.GetFileNameFromContentDisposition(dispositionHeader)
 	if err != nil {
-		return errors.New("bad request headers")
+		return errors.New("failed to get filename")
 	}
 
-	// Save file on disk
-	err = utils.SaveFileOnDisk(c.fs, localPath, filename, res.Body)
+	// Get encryption key from keyring
+	encryptionKey, err := c.getKeyringValue("encryption_key")
 	if err != nil {
-		return err
+		return errors.New("failed to get encryption_key")
+	}
+
+	// Decryption stream from response body
+	decryptionFileStream := encryption.DecryptData(res.Body, encryptionKey)
+
+	// Save file on disk
+	err = utils.SaveFileOnDisk(c.fs, localPath, filename, decryptionFileStream)
+	if err != nil {
+		return fmt.Errorf("failed to save file on disk %w", err)
 	}
 
 	return nil

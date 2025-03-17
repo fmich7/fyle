@@ -43,7 +43,6 @@ func (c *CliClient) UploadFile(localPath, serverPath string) error {
 
 	// Get encryption key from keyring
 	encryptionKey, err := c.getKeyringValue("encryption_key")
-	_ = encryptionKey
 	if err != nil {
 		return errors.New("failed to get encryption_key")
 	}
@@ -98,38 +97,40 @@ func (c *CliClient) PrepareMultipartForm(
 
 	go func() {
 		defer w.Close()
-		defer m.Close()
 
-		// write the path field
+		// Write the path field
 		if err := m.WriteField("path", serverPath); err != nil {
-			w.CloseWithError(fmt.Errorf("writing path field: %w", err))
+			w.CloseWithError(fmt.Errorf("writing path field: %v", err))
 			return
 		}
 
-		// create a form file
+		// Create a form file
 		formFile, err := m.CreateFormFile("file", localPath)
 		if err != nil {
-			w.CloseWithError(fmt.Errorf("creating form file: %w", err))
+			w.CloseWithError(fmt.Errorf("creating form file: %v", err))
 			return
 		}
 
-		// open the local file
+		// Open the local file
 		file, err := c.fs.Open(localPath)
 		if err != nil {
-			w.CloseWithError(fmt.Errorf("opening file: %w", err))
+			w.CloseWithError(fmt.Errorf("opening file: %v", err))
 			return
 		}
 		defer file.Close()
 
-		encryptedFileReader, err := encryption.EncryptData(file, encryptionKey)
-		if err != nil {
-			w.CloseWithError(fmt.Errorf("encrypting file: %w", err))
+		// Encrypt file in chunks
+		encryptionFileStream := encryption.EncryptData(file, encryptionKey)
+
+		// Copy encrypted data to form file
+		if _, err := io.Copy(formFile, encryptionFileStream); err != nil {
+			w.CloseWithError(fmt.Errorf("error copying encrypted data: %v", err))
 			return
 		}
 
-		// copy the file to the form part
-		if _, err := io.Copy(formFile, encryptedFileReader); err != nil {
-			w.CloseWithError(fmt.Errorf("copying file to form: %w", err))
+		// Close multipart writer
+		if err := m.Close(); err != nil {
+			w.CloseWithError(fmt.Errorf("error closing multipart writer: %v", err))
 			return
 		}
 	}()

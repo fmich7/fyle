@@ -124,13 +124,12 @@ func GetFileNameFromContentDisposition(header string) (string, error) {
 
 // SaveFileOnDisk saves file on disk given its path and content
 // It will not overwrite existing files on your disk
-func SaveFileOnDisk(fs afero.Fs, path, filename string, content io.ReadCloser) error {
-	defer content.Close()
+func SaveFileOnDisk(fs afero.Fs, path, filename string, content io.Reader) error {
 	newFilePath := JoinPathParts(path, filename)
 
 	// Ensure the directory exists
 	if err := fs.MkdirAll(path, os.ModePerm); err != nil {
-		return fmt.Errorf("failed to create directory %s: %v", path, err)
+		return fmt.Errorf("failed to create directory %s: %w", path, err)
 	}
 
 	// Check if the file already exists
@@ -141,7 +140,7 @@ func SaveFileOnDisk(fs afero.Fs, path, filename string, content io.ReadCloser) e
 	// Create the new file
 	file, err := fs.Create(newFilePath)
 	if err != nil {
-		return errors.New("creating file on disk")
+		return fmt.Errorf("failed to create file %s: %v", newFilePath, err)
 	}
 	defer file.Close()
 
