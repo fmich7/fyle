@@ -20,7 +20,7 @@ func GetBaseDir(path string) (string, error) {
 
 	info, err := os.Stat(absPath)
 	if err != nil {
-		// If the path doesn't exist, return its parent directory
+		// if the path doesn't exist, return its parent directory
 		if os.IsNotExist(err) {
 			return filepath.Dir(absPath), nil
 		}
@@ -36,7 +36,7 @@ func GetBaseDir(path string) (string, error) {
 
 // Replaces aliases that user might use as a home dir
 func ReplaceHomeDirAliases(path string) string {
-	// Handle home shortcuts -> defaults to user directory
+	// handle home shortcuts -> defaults to user directory
 	homeShortcuts := []string{"~", "home", "./"}
 	for _, shorthand := range homeShortcuts {
 		path = strings.TrimPrefix(path, shorthand)
@@ -47,10 +47,10 @@ func ReplaceHomeDirAliases(path string) string {
 
 // JoinPathParts joins path parts with starting path
 func JoinPathParts(storageRootPath string, parts ...string) string {
-	// Join parts
+	// join parts
 	joinedParts := filepath.Join(parts...)
 
-	// Join storage root path with joined parts
+	// join storage root path with joined parts
 	finalPath := filepath.Join(storageRootPath, joinedParts)
 
 	return filepath.Clean(finalPath)
@@ -60,7 +60,7 @@ func JoinPathParts(storageRootPath string, parts ...string) string {
 func ValidatePath(storageRootPath, constructedPath string) bool {
 	path := filepath.Clean(constructedPath)
 
-	// Prevent directory traversal attacks
+	// prevent directory traversal attacks
 	if !strings.HasPrefix(path, storageRootPath) {
 		return false
 	}
@@ -71,10 +71,10 @@ func ValidatePath(storageRootPath, constructedPath string) bool {
 // GetLocationOnServer return joined file location on the server
 // Also it checks if the path is not outside user folder
 func GetLocationOnServer(storageRootAbsPath, username, subfolders, filename string) (string, bool) {
-	// User home dir
+	// user home dir
 	userDir := filepath.Join(storageRootAbsPath, username)
 
-	// Replace aliases if they were provided
+	// replace aliases if they were provided
 	subfolders = ReplaceHomeDirAliases(subfolders)
 
 	fullPath := JoinPathParts(userDir, subfolders, filename)
@@ -88,7 +88,7 @@ func GetLocationOnServer(storageRootAbsPath, username, subfolders, filename stri
 
 // GetFileNameFromPath return filename with extension from given path
 func GetFileNameFromPath(path string) string {
-	// Windows paths to Unix style
+	// windows paths to Unix style
 	path = strings.ReplaceAll(path, "\\", "/")
 
 	// is dir
@@ -127,24 +127,24 @@ func GetFileNameFromContentDisposition(header string) (string, error) {
 func SaveFileOnDisk(fs afero.Fs, path, filename string, content io.Reader) error {
 	newFilePath := JoinPathParts(path, filename)
 
-	// Ensure the directory exists
+	// ensure the directory exists
 	if err := fs.MkdirAll(path, os.ModePerm); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", path, err)
 	}
 
-	// Check if the file already exists
+	// check if the file already exists
 	if _, err := fs.Stat(newFilePath); !os.IsNotExist(err) {
 		return fmt.Errorf("file %s already exists", newFilePath)
 	}
 
-	// Create the new file
+	// create the new file
 	file, err := fs.Create(newFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to create file %s: %v", newFilePath, err)
 	}
 	defer file.Close()
 
-	// Copy the content to the file
+	// copy the content to the file
 	_, err = io.Copy(file, content)
 	if err != nil {
 		return errors.New("copying data to file")

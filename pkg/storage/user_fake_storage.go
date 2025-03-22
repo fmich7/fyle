@@ -11,7 +11,7 @@ type FakeUserDB struct {
 	users map[string]auth.User
 }
 
-// NewFakeUserDB initalize db
+// NewFakeUserDB initialize db
 func NewFakeUserDB() *FakeUserDB {
 	return &FakeUserDB{
 		users: make(map[string]auth.User),
@@ -20,7 +20,6 @@ func NewFakeUserDB() *FakeUserDB {
 
 // StoreUser adds an user
 func (f *FakeUserDB) StoreUser(user *auth.User) error {
-
 	if _, ok := f.users[user.Username]; ok {
 		return errors.New("user already exists")
 	}

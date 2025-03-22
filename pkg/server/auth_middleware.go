@@ -8,16 +8,16 @@ import (
 	"github.com/fmich7/fyle/pkg/auth"
 )
 
+// AuthMiddleware extracts jwt authorization token from headers and passes it in ctx
 func (s *Server) AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get authorization header
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			http.Error(w, "Missing Authorization header", http.StatusUnauthorized)
 			return
 		}
 
-		// Extract the token from the "Bearer <token>" format
+		// parse bearer <token> format
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == authHeader {
 			http.Error(w, "Invalid Authorization header format", http.StatusUnauthorized)

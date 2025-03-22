@@ -32,16 +32,14 @@ func (c *CliClient) NewUploadCmd() *cobra.Command {
 	}
 }
 
-// UploadFile uploads a file to the server
+// UploadFile sends file to the server
 func (c *CliClient) UploadFile(localPath, serverPath string) error {
-	// Get stored JWT token and set it as Authorization header
 	jwtTokenBytes, err := c.getKeyringValue("jwt_token")
 	if err != nil {
 		return errors.New("failed to get authorization credentials")
 	}
 	jwtToken := string(jwtTokenBytes)
 
-	// Get encryption key from keyring
 	encryptionKey, err := c.getKeyringValue("encryption_key")
 	if err != nil {
 		return errors.New("failed to get encryption_key")
@@ -54,20 +52,19 @@ func (c *CliClient) UploadFile(localPath, serverPath string) error {
 		return err
 	}
 
-	// Create request and set headers
+	// create request
 	req, err := http.NewRequest("POST", c.UploadURL, form.FormData)
-	req.Header.Set("Content-Type", form.FormDataContentType)
 	if err != nil {
 		return fmt.Errorf("creating request: %v", err)
 	}
-
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwtToken))
+	req.Header.Set("Content-Type", form.FormDataContentType)
 
 	client := http.Client{
 		Timeout: c.RequestTimeoutTime,
 	}
 
-	// Send request
+	// send erquest
 	res, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("impossible to send a request: %v", err)
@@ -75,20 +72,19 @@ func (c *CliClient) UploadFile(localPath, serverPath string) error {
 
 	defer res.Body.Close()
 
-	// Check if request was successful
+	msg, _ := io.ReadAll(res.Body)
+	// goood rqeuest>?
 	if res.StatusCode != http.StatusCreated {
-		return fmt.Errorf("uploading file: %v", res.Status)
+		return fmt.Errorf("uploading file: %s", string(msg))
 	}
 
-	// Print response
-	respBody, _ := io.ReadAll(res.Body)
-	fmt.Println("Server Response:", string(respBody))
+	fmt.Println("Server Response:", string(msg))
 
 	return nil
 }
 
-// PrepareMultipartForm prepares a multipart form for the request
-// It doesn't load the file into memory
+// PrepareMultipartForm prepares a multipart request
+// It writes filepath, and file data in chunks
 func (c *CliClient) PrepareMultipartForm(
 	localPath, serverPath string, encryptionKey []byte,
 ) (*types.MultiPartForm, error) {
@@ -98,20 +94,19 @@ func (c *CliClient) PrepareMultipartForm(
 	go func() {
 		defer w.Close()
 
-		// Write the path field
+		// write filepath on the server
 		if err := m.WriteField("path", serverPath); err != nil {
 			w.CloseWithError(fmt.Errorf("writing path field: %v", err))
 			return
 		}
 
-		// Create a form file
+		// create form file
 		formFile, err := m.CreateFormFile("file", localPath)
 		if err != nil {
 			w.CloseWithError(fmt.Errorf("creating form file: %v", err))
 			return
 		}
 
-		// Open the local file
 		file, err := c.fs.Open(localPath)
 		if err != nil {
 			w.CloseWithError(fmt.Errorf("opening file: %v", err))
@@ -119,16 +114,14 @@ func (c *CliClient) PrepareMultipartForm(
 		}
 		defer file.Close()
 
-		// Encrypt file in chunks
+		// encrypt file in chunks (stream)
 		encryptionFileStream := encryption.EncryptData(file, encryptionKey)
 
-		// Copy encrypted data to form file
 		if _, err := io.Copy(formFile, encryptionFileStream); err != nil {
 			w.CloseWithError(fmt.Errorf("error copying encrypted data: %v", err))
 			return
 		}
 
-		// Close multipart writer
 		if err := m.Close(); err != nil {
 			w.CloseWithError(fmt.Errorf("error closing multipart writer: %v", err))
 			return

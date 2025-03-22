@@ -8,7 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// User type
+// User type that is used in storage
 type User struct {
 	ID       int
 	Username string
@@ -22,13 +22,11 @@ func NewUser(username, password string) (*User, error) {
 		return nil, errors.New("empty credentials")
 	}
 
-	// hash password
 	hashedPassword, err := hashPassword(password)
 	if err != nil {
 		return nil, err
 	}
 
-	// generate random salt
 	salt, err := encryption.GenerateRandomNBytes(16)
 	if err != nil {
 		return nil, err
