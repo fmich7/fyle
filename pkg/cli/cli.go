@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// CliClient is the client type for the cli
+// CliClient struct client type for the cli
 type CliClient struct {
 	rootCmd            *cobra.Command
 	fs                 afero.Fs
@@ -22,7 +22,7 @@ type CliClient struct {
 	RequestTimeoutTime time.Duration
 }
 
-// NewCliClient creates a new CliClient object
+// NewCliClient creates a new CliClient object with specified file system
 func NewCliClient(fs afero.Fs) *CliClient {
 	client := &CliClient{
 		rootCmd: &cobra.Command{

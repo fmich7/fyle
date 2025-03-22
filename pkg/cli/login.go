@@ -32,7 +32,7 @@ func (c *CliClient) NewLoginCmd() *cobra.Command {
 	}
 }
 
-// LoginUser sends given credentials to server in order to receive and store JWT
+// LoginUser sends credentials to the server to login and store JWT token
 func (c *CliClient) LoginUser(username, password string) error {
 	if username == "" {
 		return errors.New("username argument is empty")
@@ -46,10 +46,7 @@ func (c *CliClient) LoginUser(username, password string) error {
 	}
 
 	loginCredentials := new(types.LoginResponse)
-
-	// unmarshal response
-	err = json.Unmarshal(data, loginCredentials)
-	if err != nil {
+	if err = json.Unmarshal(data, loginCredentials); err != nil {
 		return errors.New("failed to unmarshal server response")
 	}
 
@@ -65,7 +62,7 @@ func (c *CliClient) LoginUser(username, password string) error {
 		return err
 	}
 
-	// generate key from password and salt
+	// generate symmetric key from password and salt
 	encryptionKey := encryption.GeneratePBEKey(password, salt)
 
 	// store encryption key
@@ -77,6 +74,7 @@ func (c *CliClient) LoginUser(username, password string) error {
 	return nil
 }
 
+// makeLoginRequest makes login request to the server
 func (c *CliClient) makeLoginRequest(username, password string) ([]byte, error) {
 	body := new(bytes.Buffer)
 	err := json.NewEncoder(body).Encode(types.AuthUserRequest{

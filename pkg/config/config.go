@@ -17,13 +17,13 @@ type Config struct {
 	PostgresCredentials types.PostgresCredentials
 }
 
-// LoadConfig loads config to Config from .env file with specified fileName
+// LoadConfig loads config from .env file
 func (c *Config) LoadConfig(fileName string) {
 	if fileName == "" {
 		fileName = ".env"
 	}
 
-	// load config
+	// load config file
 	if err := godotenv.Load(fileName); err != nil {
 		log.Println("No .env file found, using system environment variables")
 	}
@@ -35,7 +35,7 @@ func (c *Config) LoadConfig(fileName string) {
 	c.PostgresCredentials = getPostgresCredentials()
 }
 
-// getEnv looks up if key exists in env, if so returns it;s value
+// getEnv set key value from env if exists, otherwise default value
 func getEnv(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
@@ -43,7 +43,7 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
-// getPostgresCredentials return credentials that are used to connect to db
+// getPostgresCredentials returns credentials that are used to connect to db
 func getPostgresCredentials() types.PostgresCredentials {
 	return types.PostgresCredentials{
 		DB_USER:     getEnv("POSTGRES_USER", "admin"),

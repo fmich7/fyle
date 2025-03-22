@@ -20,7 +20,7 @@ import (
 func TestLoginUser(t *testing.T) {
 	afs := afero.NewMemMapFs()
 	db, err := storage.NewTestingStorage(afs)
-	require.NoError(t, err, "initalizing db")
+	require.NoError(t, err, "initializing db")
 
 	cfg := config.NewTestingConfig()
 	mockServer := server.NewServer(cfg, db)
@@ -51,7 +51,7 @@ func TestLoginUser(t *testing.T) {
 func TestHandleLogin(t *testing.T) {
 	afs := afero.NewMemMapFs()
 	db, err := storage.NewTestingStorage(afs)
-	require.NoError(t, err, "initalizing db")
+	require.NoError(t, err, "initializing db")
 
 	cfg := config.NewTestingConfig()
 	mockServer := server.NewServer(cfg, db)

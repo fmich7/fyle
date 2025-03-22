@@ -1,6 +1,6 @@
 package config
 
-// NewTestingConfig return config that is used for testing
+// NewTestingConfig returns config that is used for testing
 func NewTestingConfig() *Config {
 	return &Config{
 		ServerPort:      ":0",

@@ -30,7 +30,7 @@ func (c *CliClient) NewSignUPCmd() *cobra.Command {
 	}
 }
 
-// SignUPUser sends given information to the server to sign up new user
+// SignUPUser sends singup request to the server
 func (c *CliClient) SignUPUser(username, password string) error {
 	if username == "" {
 		return errors.New("username argument is empty")

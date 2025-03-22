@@ -27,7 +27,7 @@ func printDir(fs afero.Fs, path, rootPath string, depth int, buf *strings.Builde
 		return fmt.Errorf("reading specified path %v", err)
 	}
 
-	// Print curr folder
+	// print curr folder
 	folder, err := filepath.Rel(rootPath, path)
 	if err != nil {
 		return err
@@ -40,7 +40,7 @@ func printDir(fs afero.Fs, path, rootPath string, depth int, buf *strings.Builde
 
 	depth++
 	for _, entry := range entries {
-		// Recursive print dirs
+		// recursive print dirs
 		if entry.IsDir() {
 			newDir := filepath.Join(path, entry.Name())
 			err := printDir(fs, newDir, path, depth, buf)
@@ -48,7 +48,7 @@ func printDir(fs afero.Fs, path, rootPath string, depth int, buf *strings.Builde
 				return err
 			}
 		} else {
-			// Print entry
+			// print entry
 			_, err := buf.WriteString(printIndent(entry.Name(), depth))
 			if err != nil {
 				return err

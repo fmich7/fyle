@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewListTreeCmd lists all files that user has stored
+// NewListTreeCmd lists all the files that user stores on the server
 func (c *CliClient) NewListTreeCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "ls [serverPath]",
@@ -29,28 +29,26 @@ func (c *CliClient) NewListTreeCmd() *cobra.Command {
 	}
 }
 
-// ListFiles prints user's files stored on server
+// ListFiles makes request to list user's storage file structure
 func (c *CliClient) ListFiles(path string) error {
 	body := new(bytes.Buffer)
-	err := json.NewEncoder(body).Encode(types.ListFilesRequest{
-		Path: path,
-	})
-	if err != nil {
+	if err := json.NewEncoder(body).Encode(types.ListFilesRequest{Path: path}); err != nil {
 		return errors.New("failed to create request body")
 	}
 
-	req, err := http.NewRequest("POST", c.ListFilesURL, body)
-	if err != nil {
-		return errors.New("failed to construct request")
-	}
-	req.Header.Set("Content-Type", "application/json")
-
+	// jwt from keyring
 	jwtTokenBytes, err := c.getKeyringValue("jwt_token")
 	if err != nil {
 		return errors.New("failed to get authorization credentials")
 	}
 	jwtToken := string(jwtTokenBytes)
+
+	req, err := http.NewRequest("POST", c.ListFilesURL, body)
+	if err != nil {
+		return errors.New("failed to construct request")
+	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwtToken))
+	req.Header.Set("Content-Type", "application/json")
 
 	client := http.Client{
 		Timeout: c.RequestTimeoutTime,

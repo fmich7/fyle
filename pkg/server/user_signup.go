@@ -21,7 +21,7 @@ func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create new user
+	// create new user
 	user, err := auth.NewUser(usrRequest.Username, usrRequest.Password)
 	if err != nil {
 		log.Println(err)
@@ -29,7 +29,7 @@ func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Store user
+	// store user
 	if err := s.store.StoreUser(user); err != nil {
 		log.Println(err)
 		http.Error(w, "failed to store user on a server", http.StatusInternalServerError)

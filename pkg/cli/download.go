@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/fmich7/fyle/pkg/encryption"
@@ -41,61 +42,64 @@ func (c *CliClient) NewDownloadCmd() *cobra.Command {
 	}
 }
 
-// DownloadFile handles download request from cli
+// DownloadFile makes request to download specific file from the server
 func (c *CliClient) DownloadFile(serverPath, localPath string) error {
-	data := types.DownloadRequest{
-		Path: serverPath,
+	body := new(bytes.Buffer)
+	if err := json.NewEncoder(body).Encode(types.DownloadRequest{Path: serverPath}); err != nil {
+		return errors.New("failed to create request body")
 	}
 
-	// Marshall request data
-	marshalled, err := json.Marshal(data)
-	if err != nil {
-		return errors.New("marshalling data")
-	}
-
-	// Send request
-	req, err := http.NewRequest("POST", c.DownloadURL, bytes.NewBuffer(marshalled))
-	if err != nil {
-		return errors.New("couldn't construct a request")
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	// Load jwt token from keyring and set it as Authorization header
+	// load jwt from keyring
 	jwtTokenBytes, err := c.getKeyringValue("jwt_token")
 	if err != nil {
 		return errors.New("failed to get authorization credentials")
 	}
 	jwtToken := string(jwtTokenBytes)
+
+	// construct request
+	req, err := http.NewRequest("POST", c.DownloadURL, body)
+	if err != nil {
+		return errors.New("couldn't construct a request")
+	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", jwtToken))
+	req.Header.Set("Content-Type", "application/json")
 
 	client := http.Client{
 		Timeout: c.RequestTimeoutTime,
 	}
 
-	// Send request
+	// send request to the server
 	res, err := client.Do(req)
 	if err != nil {
 		return errors.New("impossible to send a request")
 	}
 	defer res.Body.Close()
 
-	// Check disposition header and get filename
+	// Is resp good?
+	if res.StatusCode != http.StatusOK {
+		msg, err := io.ReadAll(res.Body)
+		if err != nil {
+			return errors.New("failed to read server response")
+		}
+		return errors.New(string(msg))
+	}
+
+	// check disposition header for filename
 	dispositionHeader := res.Header.Get("Content-Disposition")
 	filename, err := utils.GetFileNameFromContentDisposition(dispositionHeader)
 	if err != nil {
 		return errors.New("failed to get filename")
 	}
 
-	// Get encryption key from keyring
+	// get encryption key from keyring
 	encryptionKey, err := c.getKeyringValue("encryption_key")
 	if err != nil {
 		return errors.New("failed to get encryption_key")
 	}
 
-	// Decryption stream from response body
+	// make decryption stream from response content
 	decryptionFileStream := encryption.DecryptData(res.Body, encryptionKey)
 
-	// Save file on disk
 	err = utils.SaveFileOnDisk(c.fs, localPath, filename, decryptionFileStream)
 	if err != nil {
 		return fmt.Errorf("failed to save file on disk %w", err)
