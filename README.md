@@ -8,7 +8,7 @@
 
 **File upload service with built-in encryption 📂🕵🏻**
 
-[Description](#-description) • [Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Testing](#%EF%B8%8F-testing)
+[Description](#-description) • [Features](#-features) • [Quick Start](#-quick-start) • [Usage](#-usage) • [Documentation](#-documentation) • [Testing](#%EF%B8%8F-testing)
 
 </div>
 
@@ -29,10 +29,10 @@ _Fyle_ is a _file storage_ service written in **Go** that supports securely **fi
   - Token-based authentication using JWT (stored in keyring)
   - Ensures that only authorized users can access their files
 - **CLI Client**
-  - Easily interact with the server using a CLI client (see [📄Usage](#-features))
+  - Easily interact with the server using a CLI client (see [📄Usage](#-usage))
 - **Testing**
   - Almost the whole codebase is covered with tests
-  - Uses afero for filesystem mocking
+  - Use afero for filesystem mocking
 
 ## 🚀 Quick Start
 
