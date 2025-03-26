@@ -8,13 +8,13 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-// AuthClaims stores user data in jwt token
+// AuthClaims stores user data in jwt token.
 type AuthClaims struct {
 	Username string `json:"username"`
 	jwt.StandardClaims
 }
 
-// CreateToken creates token for user that lasts 24h
+// CreateToken creates token for user that lasts 24h.
 func CreateToken(secret, username string) (string, error) {
 	claims := AuthClaims{
 		Username: username,
@@ -28,7 +28,7 @@ func CreateToken(secret, username string) (string, error) {
 	return token.SignedString([]byte(secret))
 }
 
-// ValidateToken validates jwt token
+// ValidateToken validates jwt token.
 func ValidateToken(secret, tokenString string) error {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
@@ -45,11 +45,15 @@ func ValidateToken(secret, tokenString string) error {
 	return nil
 }
 
-// ParseToken parses jwt token and returns user claims
+// ParseToken parses jwt token and returns user claims.
 func ParseToken(secret, tokenString string) (*AuthClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &AuthClaims{}, func(t *jwt.Token) (interface{}, error) {
-		return []byte(secret), nil
-	})
+	token, err := jwt.ParseWithClaims(
+		tokenString,
+		&AuthClaims{},
+		func(t *jwt.Token) (interface{}, error) {
+			return []byte(secret), nil
+		},
+	)
 
 	if err != nil || !token.Valid {
 		return nil, errors.New("invalid token")

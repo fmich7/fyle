@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-// GetBaseDir returns absolute path without filename (parent folder)
+// GetBaseDir returns absolute path without filename (parent folder).
 func GetBaseDir(path string) (string, error) {
 	absPath, err := filepath.Abs(path)
 	if err != nil {
@@ -34,7 +34,7 @@ func GetBaseDir(path string) (string, error) {
 	return filepath.Dir(absPath), nil
 }
 
-// Replaces aliases that user might use as a home dir
+// Replaces aliases that user might use as a home dir.
 func ReplaceHomeDirAliases(path string) string {
 	// handle home shortcuts -> defaults to user directory
 	homeShortcuts := []string{"~", "home", "./"}
@@ -45,7 +45,7 @@ func ReplaceHomeDirAliases(path string) string {
 	return path
 }
 
-// JoinPathParts joins path parts with starting path
+// JoinPathParts joins path parts with starting path.
 func JoinPathParts(storageRootPath string, parts ...string) string {
 	// join parts
 	joinedParts := filepath.Join(parts...)
@@ -56,7 +56,7 @@ func JoinPathParts(storageRootPath string, parts ...string) string {
 	return filepath.Clean(finalPath)
 }
 
-// ValidatePath check if constructedPath isn't "higher" than rootPath
+// ValidatePath check if constructedPath isn't "higher" than rootPath.
 func ValidatePath(storageRootPath, constructedPath string) bool {
 	path := filepath.Clean(constructedPath)
 
@@ -68,8 +68,8 @@ func ValidatePath(storageRootPath, constructedPath string) bool {
 	return true
 }
 
-// GetLocationOnServer return joined file location on the server
-// Also it checks if the path is not outside user folder
+// GetLocationOnServer return joined file location on the server.
+// Also it checks if the path is not outside user folder.
 func GetLocationOnServer(storageRootAbsPath, username, subfolders, filename string) (string, bool) {
 	// user home dir
 	userDir := filepath.Join(storageRootAbsPath, username)
@@ -86,7 +86,7 @@ func GetLocationOnServer(storageRootAbsPath, username, subfolders, filename stri
 	return fullPath, true
 }
 
-// GetFileNameFromPath return filename with extension from given path
+// GetFileNameFromPath return filename with extension from given path.
 func GetFileNameFromPath(path string) string {
 	// windows paths to Unix style
 	path = strings.ReplaceAll(path, "\\", "/")
@@ -99,7 +99,7 @@ func GetFileNameFromPath(path string) string {
 	return filepath.Base(path)
 }
 
-// GetFileNameFromContentDisposition returns filename from Content-Disposition header
+// GetFileNameFromContentDisposition returns filename from Content-Disposition header.
 func GetFileNameFromContentDisposition(header string) (string, error) {
 	lowerHeader := strings.ToLower(header)
 	if idx := strings.Index(lowerHeader, "filename="); idx != -1 {
@@ -122,8 +122,8 @@ func GetFileNameFromContentDisposition(header string) (string, error) {
 	return "", errors.New("invalid header")
 }
 
-// SaveFileOnDisk saves file on disk given its path and content
-// It will not overwrite existing files on your disk
+// SaveFileOnDisk saves file on disk given its path and content.
+// It will not overwrite existing files on your disk.
 func SaveFileOnDisk(fs afero.Fs, path, filename string, content io.Reader) error {
 	newFilePath := JoinPathParts(path, filename)
 

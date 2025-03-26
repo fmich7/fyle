@@ -7,14 +7,14 @@ import (
 	"github.com/fmich7/fyle/pkg/storage"
 )
 
-// Server is a struct that represents the server
+// Server is a struct that represents the server.
 type Server struct {
 	listenAddr   string
 	store        storage.Storage
 	jwtSecretKey string
 }
 
-// NewServer creates a new instance of the Server struct
+// NewServer creates a new instance of the Server struct.
 func NewServer(cfg *config.Config, store storage.Storage) *Server {
 	return &Server{
 		listenAddr:   cfg.ServerPort,
@@ -23,7 +23,7 @@ func NewServer(cfg *config.Config, store storage.Storage) *Server {
 	}
 }
 
-// Start starts the server
+// Start starts the server.
 func (s *Server) Start() error {
 	// File related routes
 	http.HandleFunc("POST /file", s.AuthMiddleware(s.HandleFileUpload))

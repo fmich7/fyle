@@ -16,13 +16,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// PQUserStorage represents a user storage
+// PQUserStorage represents a user storage.
 type PQUserStorage struct {
 	db      *sql.DB
 	connStr string
 }
 
-// NewPQUserStorage creates a new user storage
+// NewPQUserStorage creates a new user storage.
 func NewPQUserStorage(c types.PostgresCredentials) (*PQUserStorage, error) {
 	connStr := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
@@ -46,12 +46,12 @@ func NewPQUserStorage(c types.PostgresCredentials) (*PQUserStorage, error) {
 	}, nil
 }
 
-// CloseDatabase closes the database connection
+// CloseDatabase closes the database connection.
 func (d *PQUserStorage) CloseDatabase() error {
 	return d.db.Close()
 }
 
-// StoreUser stores a user in the database
+// StoreUser stores a user in the database.
 func (d *PQUserStorage) StoreUser(user *auth.User) error {
 	existQuery := `
 	SELECT EXISTS (
@@ -82,7 +82,7 @@ func (d *PQUserStorage) StoreUser(user *auth.User) error {
 	return nil
 }
 
-// RetrieveUser retrieves a user from the database
+// RetrieveUser retrieves a user from the database.
 func (d *PQUserStorage) RetrieveUser(username string) (*auth.User, error) {
 	user := new(auth.User)
 	getUserQuery := `
@@ -103,7 +103,7 @@ func (d *PQUserStorage) RetrieveUser(username string) (*auth.User, error) {
 	return user, nil
 }
 
-// RunMigrations runs all migrations in the given directory
+// RunMigrations runs all migrations in the given directory.
 func (d *PQUserStorage) RunMigrations(migrationsDir string) error {
 	log.Println("Starting migrations...")
 

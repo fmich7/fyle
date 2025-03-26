@@ -8,7 +8,7 @@ import (
 	"github.com/fmich7/fyle/pkg/auth"
 )
 
-// AuthMiddleware extracts jwt authorization token from headers and passes it in ctx
+// AuthMiddleware extracts jwt authorization token from headers and passes it in ctx.
 func (s *Server) AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")

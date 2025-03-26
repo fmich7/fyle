@@ -11,7 +11,7 @@ import (
 	"github.com/fmich7/fyle/pkg/utils"
 )
 
-// HandleFileDownload handles file download request
+// HandleFileDownload handles file download request.
 func (s *Server) HandleFileDownload(w http.ResponseWriter, r *http.Request) {
 	log.Println("Downloading file")
 

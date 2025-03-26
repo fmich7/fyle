@@ -14,14 +14,14 @@
 
 ## 📖 Description
 
-_Fyle_ is a _file storage_ service written in **Go** that supports securely **file managment** with **AES-GCM** and a **nonce** for **unique encryption**. It uses **JWT authentication** for user access and streams data in chunks to keep memory usage low. Sensitive data like credentials and encryption keys are safely stored in the **system's keyring**.
+_Fyle_ is a _file storage_ service written in **Go** that supports secure **file managment** with **AES-GCM** for **unique encryption**. It uses **JWT authentication** for user access and streams data in chunks to keep memory usage low. Sensitive data like credentials and encryption keys are safely stored in the **system's keyring**.
 
 ## ✨ Features
 
 - **End-to-end encryption**
   - Generate encryption key from user credentials and salt (from DB)
   - Store encryption key in system's keyring
-  - Uniquely encrypt files with AES-GCM, nonce and the key
+  - Uniquely encrypt files with AES-GCM
 - **Streaming files**
   - Supports sending and receiving files in chunks (4kb chunks)
   - Encrypt and decrypt on the fly
@@ -51,7 +51,7 @@ docker-compose up
 ### 3. Use CLI client
 
 ```bash
-fyle signup <username> <password>
+fyle signup [username] [password]
 ```
 
 > **[Optional]** Modify server configuration in `cmd/server/example_server.env`
@@ -59,11 +59,11 @@ fyle signup <username> <password>
 ## 📄 Usage
 
 ```bash
-fyle ls                               # List all your files on the server
-fyle upload <file_path>				  # Upload file to the server
-fyle download <file_id> <output_path> # Download file from provided path
-fyle signup <username> <password>     # Sign up a new user
-fyle login <username> <password>      # Login to the server
+fyle ls                                # List all your files on the server
+fyle upload [localPath] [serverPath]   # Upload file to the server
+fyle download [serverPath] [localPath] # Download file from provided path
+fyle signup [username] [password]      # Sign up a new user
+fyle login [username] [password]       # Login to the server
 ```
 
 > Run `fyle --help` to see all available commands and options.

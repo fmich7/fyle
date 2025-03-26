@@ -8,7 +8,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Config struct is a type that server is using for its configuration
+// Config struct is a type that server is using for its configuration.
 type Config struct {
 	ServerPort          string
 	JWTsecretKey        string
@@ -17,7 +17,7 @@ type Config struct {
 	PostgresCredentials types.PostgresCredentials
 }
 
-// LoadConfig loads config from .env file
+// LoadConfig loads config from .env file.
 func (c *Config) LoadConfig(fileName string) {
 	if fileName == "" {
 		fileName = ".env"
@@ -35,7 +35,7 @@ func (c *Config) LoadConfig(fileName string) {
 	c.PostgresCredentials = getPostgresCredentials()
 }
 
-// getEnv set key value from env if exists, otherwise default value
+// getEnv set key value from env if exists, otherwise default value.
 func getEnv(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
@@ -43,7 +43,7 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
-// getPostgresCredentials returns credentials that are used to connect to db
+// getPostgresCredentials returns credentials that are used to connect to db.
 func getPostgresCredentials() types.PostgresCredentials {
 	return types.PostgresCredentials{
 		DB_USER:     getEnv("POSTGRES_USER", "admin"),

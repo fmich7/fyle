@@ -2,7 +2,7 @@ package cli
 
 import "github.com/99designs/keyring"
 
-// setKeyringValue stores data in keyring with given key
+// setKeyringValue stores data in keyring with given key.
 func (c *CliClient) setKeyringValue(key string, data []byte) error {
 	ring, err := keyring.Open(keyring.Config{
 		ServiceName: c.KeyRingName,
@@ -17,7 +17,7 @@ func (c *CliClient) setKeyringValue(key string, data []byte) error {
 	})
 }
 
-// getKeyringValue retrieves key's data from keyring
+// getKeyringValue retrieves key's data from keyring.
 func (c *CliClient) getKeyringValue(key string) ([]byte, error) {
 	ring, err := keyring.Open(keyring.Config{
 		ServiceName: c.KeyRingName,

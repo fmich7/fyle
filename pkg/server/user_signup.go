@@ -9,7 +9,7 @@ import (
 	"github.com/fmich7/fyle/pkg/types"
 )
 
-// HandleSignUp handles sign up request
+// HandleSignUp handles sign up request.
 func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

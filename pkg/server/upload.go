@@ -8,7 +8,7 @@ import (
 	"github.com/fmich7/fyle/pkg/utils"
 )
 
-// HandleFileUpload handles the file upload request
+// HandleFileUpload handles the file upload request.
 func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	log.Println("Uploading file")
 

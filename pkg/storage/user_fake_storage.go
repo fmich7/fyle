@@ -6,19 +6,19 @@ import (
 	"github.com/fmich7/fyle/pkg/auth"
 )
 
-// FakeUserDB simulates an memory user db
+// FakeUserDB simulates an memory user db.
 type FakeUserDB struct {
 	users map[string]auth.User
 }
 
-// NewFakeUserDB initialize db
+// NewFakeUserDB initialize db.
 func NewFakeUserDB() *FakeUserDB {
 	return &FakeUserDB{
 		users: make(map[string]auth.User),
 	}
 }
 
-// StoreUser adds an user
+// StoreUser adds an user.
 func (f *FakeUserDB) StoreUser(user *auth.User) error {
 	if _, ok := f.users[user.Username]; ok {
 		return errors.New("user already exists")
@@ -32,7 +32,7 @@ func (f *FakeUserDB) StoreUser(user *auth.User) error {
 	return nil
 }
 
-// RetrieveUser reutrns an user from memory
+// RetrieveUser reutrns an user from memory.
 func (f *FakeUserDB) RetrieveUser(username string) (*auth.User, error) {
 	user, exists := f.users[username]
 	if !exists {

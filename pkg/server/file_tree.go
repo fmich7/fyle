@@ -7,7 +7,7 @@ import (
 	"github.com/fmich7/fyle/pkg/types"
 )
 
-// HandleListFiles returns user file tree
+// HandleListFiles returns user file tree.
 func (s *Server) HandleListFiles(w http.ResponseWriter, r *http.Request) {
 	username := r.Context().Value("username").(string)
 

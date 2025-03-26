@@ -31,7 +31,11 @@ func TestHandleFileDownload(t *testing.T) {
 
 	// create mock file
 	fileServerPath := filepath.Join(storage.GetFileUploadsLocation(), user, filename)
-	require.NoError(t, afero.WriteFile(afs, fileServerPath, content, 0777), "Expected no error writing file")
+	require.NoError(
+		t,
+		afero.WriteFile(afs, fileServerPath, content, 0777),
+		"Expected no error writing file",
+	)
 
 	// create server
 	server := server.NewServer(config.NewTestingConfig(), storage)
@@ -40,7 +44,11 @@ func TestHandleFileDownload(t *testing.T) {
 	sendRequest := func(t *testing.T, path string) *httptest.ResponseRecorder {
 		t.Helper()
 		body := new(bytes.Buffer)
-		require.NoError(t, json.NewEncoder(body).Encode(types.DownloadRequest{Path: path}), "Expected no error marshalling request data")
+		require.NoError(
+			t,
+			json.NewEncoder(body).Encode(types.DownloadRequest{Path: path}),
+			"Expected no error marshalling request data",
+		)
 
 		req := httptest.NewRequest("POST", "/getfile", body)
 		req.Header.Set("Content-Type", "application/json")
@@ -55,16 +63,16 @@ func TestHandleFileDownload(t *testing.T) {
 		return rec
 	}
 
-	// TEST: Valid file download
+	// Valid file download
 	response := sendRequest(t, filename)
 	assert.Equal(http.StatusOK, response.Code, string(response.Body.Bytes()))
 	assert.Equal(content, response.Body.Bytes(), "Expected file content to be the same")
 
-	// TEST: Request for non-existent file
+	// Request for non-existent file
 	response = sendRequest(t, "DFHJADFKLJADJFDKLFLJKJKLF.txt")
 	assert.Equal(http.StatusBadRequest, response.Code, "Expected bad request for missing file")
 
-	// TEST: Invalid file path (path traversal attack)
+	// Invalid file path (path traversal attack)
 	response = sendRequest(t, "../../../file.txt")
 	assert.Equal(http.StatusBadRequest, response.Code, "Expected bad request for invalid path")
 }

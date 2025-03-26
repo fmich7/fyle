@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// CliClient struct client type for the cli
+// CliClient struct client type for the cli.
 type CliClient struct {
 	rootCmd            *cobra.Command
 	fs                 afero.Fs
@@ -22,7 +22,7 @@ type CliClient struct {
 	RequestTimeoutTime time.Duration
 }
 
-// NewCliClient creates a new CliClient object with specified file system
+// NewCliClient creates a new CliClient object with specified file system.
 func NewCliClient(fs afero.Fs) *CliClient {
 	client := &CliClient{
 		rootCmd: &cobra.Command{
@@ -46,14 +46,14 @@ func NewCliClient(fs afero.Fs) *CliClient {
 	return client
 }
 
-// Execute runs the root command
+// Execute runs the root command.
 func (c *CliClient) Execute() {
 	if err := c.rootCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "error executing cli: %v", err)
 	}
 }
 
-// Attaches commands to the client
+// Attaches commands to the client.
 func (c *CliClient) attachCommands() {
 	c.rootCmd.AddCommand(c.NewUploadCmd())
 	c.rootCmd.AddCommand(c.NewDownloadCmd())

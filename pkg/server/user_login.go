@@ -9,7 +9,7 @@ import (
 	"github.com/fmich7/fyle/pkg/types"
 )
 
-// LoginUser return jwt token if user exists and password is correct
+// LoginUser return jwt token if user exists and password is correct.
 func (s *Server) LoginUser(username, password string) (*types.LoginResponse, error) {
 	usr, err := s.store.RetrieveUser(username)
 	if err != nil {
@@ -33,7 +33,7 @@ func (s *Server) LoginUser(username, password string) (*types.LoginResponse, err
 	}, nil
 }
 
-// HandleLogin handles login request and returns jwt token on success
+// HandleLogin handles login request and returns jwt token on success.
 func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

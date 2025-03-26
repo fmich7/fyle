@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewDownloadCmd creates a new download command
+// NewDownloadCmd creates a new download command.
 func (c *CliClient) NewDownloadCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "download [serverPath] [localPath]",
@@ -42,7 +42,7 @@ func (c *CliClient) NewDownloadCmd() *cobra.Command {
 	}
 }
 
-// DownloadFile makes request to download specific file from the server
+// DownloadFile makes request to download specific file from the server.
 func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	body := new(bytes.Buffer)
 	if err := json.NewEncoder(body).Encode(types.DownloadRequest{Path: serverPath}); err != nil {

@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestNewUploadCmd ensures that the upload command is created successfully
 func TestNewUploadCmd_ValidArgs(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	client := cli.NewCliClient(fs)
@@ -34,7 +33,6 @@ func mockUploadServer(expectedStatus int) *httptest.Server {
 	return httptest.NewServer(handler)
 }
 
-// TestUploadFile_Success tests successful file upload
 func TestUploadFile_Success(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	client := cli.NewCliClient(fs)
@@ -50,7 +48,6 @@ func TestUploadFile_Success(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// TestUploadFile_FailedRequest - failed HTTP request
 func TestUploadFile_FailedRequest(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	client := cli.NewCliClient(fs)
@@ -65,7 +62,6 @@ func TestUploadFile_FailedRequest(t *testing.T) {
 	assert.Contains(t, err.Error(), "impossible to send a request")
 }
 
-// TestUploadFile_FormCreationError error in multipart form creation
 func TestUploadFile_FormCreationError(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	client := cli.NewCliClient(fs)

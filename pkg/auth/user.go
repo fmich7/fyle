@@ -8,7 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// User type that is used in storage
+// User type that is used in storage.
 type User struct {
 	ID       int
 	Username string
@@ -16,7 +16,7 @@ type User struct {
 	Salt     string
 }
 
-// NewUser creates new user with hashed password
+// NewUser creates new user with hashed password.
 func NewUser(username, password string) (*User, error) {
 	if len(username) == 0 || len(password) == 0 {
 		return nil, errors.New("empty credentials")
@@ -40,12 +40,12 @@ func NewUser(username, password string) (*User, error) {
 
 }
 
-// CheckPassword checks if user provided valid password
+// CheckPassword checks if user provided valid password.
 func CheckPassword(storedPassword, enteredPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(enteredPassword))
 }
 
-// hashPassword hashes given password
+// hashPassword hashes given password.
 func hashPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {

@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestNewDownloadCmd ensures that the download command is created successfully
 func TestNewDownloadCmd_ValidArgs(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	client := cli.NewCliClient(fs)
@@ -26,16 +25,16 @@ func TestDownloadFile_Success(t *testing.T) {
 	assert := assert.New(t)
 	afs := afero.NewMemMapFs()
 
-	// Create a temp file for testing
+	// create a temp file for testing
 	filename := "testfile"
 	err := afero.WriteFile(afs, filename, []byte("SOME DATA!!!"), 0777)
 	require.NoError(t, err, "Failed to create temporary file")
 
-	// Create a directory to simulate the download folder
+	// create a directory to simulate the download folder
 	err = afs.Mkdir("download", 0777)
 	require.NoError(t, err, "Failed to create download directory")
 
-	// Mock server
+	// mock server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Disposition", "attachment; filename="+filename)
 		w.Header().Set("Content-Type", "application/octet-stream")
@@ -67,7 +66,6 @@ func TestDownloadFile_Success(t *testing.T) {
 	assert.True(exists, "File should exist after download")
 }
 
-// TestDownloadFile_FailedRequest - failed HTTP request
 func TestDownloadFile_FailedRequest(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	client := cli.NewCliClient(fs)

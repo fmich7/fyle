@@ -6,7 +6,7 @@ import (
 	"net/textproto"
 )
 
-// File represents a file object
+// File represents a file object.
 type File struct {
 	Filename string
 	Header   textproto.MIMEHeader
@@ -16,8 +16,13 @@ type File struct {
 	Location string
 }
 
-// NewFile creates a new File object
-func NewFile(header *multipart.FileHeader, file multipart.File, owner string, location string) *File {
+// NewFile creates a new File object.
+func NewFile(
+	header *multipart.FileHeader,
+	file multipart.File,
+	owner string,
+	location string,
+) *File {
 	return &File{
 		Filename: header.Filename,
 		Header:   header.Header,
@@ -28,7 +33,7 @@ func NewFile(header *multipart.FileHeader, file multipart.File, owner string, lo
 	}
 }
 
-// MultiPartForm represents a multi part form
+// MultiPartForm represents a multi part form.
 type MultiPartForm struct {
 	FormData            *io.PipeReader
 	FormDataContentType string

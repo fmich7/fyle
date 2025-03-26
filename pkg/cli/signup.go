@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewSignUPCmd creates a new sign up command
+// NewSignUPCmd creates a new sign up command.
 func (c *CliClient) NewSignUPCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "signup [username] [password]",
@@ -30,7 +30,7 @@ func (c *CliClient) NewSignUPCmd() *cobra.Command {
 	}
 }
 
-// SignUPUser sends singup request to the server
+// SignUPUser sends singup request to the server.
 func (c *CliClient) SignUPUser(username, password string) error {
 	if username == "" {
 		return errors.New("username argument is empty")

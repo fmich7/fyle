@@ -11,15 +11,15 @@ import (
 	"github.com/spf13/afero"
 )
 
-// DiskFileStorage is a struct that implements the Storage interface
-// It is used to store files on disk
+// DiskFileStorage is a struct that implements the Storage interface.
+// It is used to store files on disk.
 type DiskFileStorage struct {
 	fs       afero.Fs
 	location string
 }
 
-// NewDiskFileStorage creates a new DiskStorage object
-// fs (nil is standard filesystem), you can pass aerof.Fs object for testing
+// NewDiskFileStorage creates a new DiskStorage object.
+// fs (nil is standard filesystem), you can pass aerof.Fs object for testing.
 func NewDiskFileStorage(fileUploadsLocation string, fs afero.Fs) (*DiskFileStorage, error) {
 	// default to OS filesystem if none is provided
 	if fs == nil {
@@ -47,7 +47,7 @@ func NewDiskFileStorage(fileUploadsLocation string, fs afero.Fs) (*DiskFileStora
 	}, nil
 }
 
-// UploadFile creates a file in the disk storage
+// UploadFile creates a file in the disk storage.
 func (d *DiskFileStorage) StoreFile(file *types.File) error {
 	defer file.Data.Close()
 
@@ -67,14 +67,14 @@ func (d *DiskFileStorage) StoreFile(file *types.File) error {
 	return nil
 }
 
-// RetrieveFile returns io.ReaderCloser of stored file
-// Allows to copy content from file without loading it to memory
+// RetrieveFile returns io.ReaderCloser of stored file.
+// Allows to copy content from file without loading it to memory.
 func (d *DiskFileStorage) RetrieveFile(path string) (io.ReadCloser, error) {
 	return d.fs.Open(path)
 }
 
-// createFile creates a file in the disk storage
-// It creates the directory if it doesn't exist
+// createFile creates a file in the disk storage.
+// It creates the directory if it doesn't exist.
 func (d *DiskFileStorage) createFile(file *types.File) (afero.File, error) {
 	dirPath := filepath.Dir(file.Location)
 
@@ -88,12 +88,12 @@ func (d *DiskFileStorage) createFile(file *types.File) (afero.File, error) {
 	return d.fs.Create(file.Location)
 }
 
-// GetFileUploadsLocation returns the file uploads location
+// GetFileUploadsLocation returns the file uploads location.
 func (d *DiskFileStorage) GetFileUploadsLocation() string {
 	return d.location
 }
 
-// GetUserFileTree returns string with user's files
+// GetUserFileTree returns string with user's files.
 func (d *DiskFileStorage) GetUserFileTree(username, path string) (string, error) {
 	// get absolute valid path
 	fullPath := utils.JoinPathParts(d.GetFileUploadsLocation(), username, path)

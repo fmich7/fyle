@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewListTreeCmd lists all the files that user stores on the server
+// NewListTreeCmd lists all the files that user stores on the server.
 func (c *CliClient) NewListTreeCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "ls [serverPath]",
@@ -29,7 +29,7 @@ func (c *CliClient) NewListTreeCmd() *cobra.Command {
 	}
 }
 
-// ListFiles makes request to list user's storage file structure
+// ListFiles makes request to list user's storage file structure.
 func (c *CliClient) ListFiles(path string) error {
 	body := new(bytes.Buffer)
 	if err := json.NewEncoder(body).Encode(types.ListFilesRequest{Path: path}); err != nil {

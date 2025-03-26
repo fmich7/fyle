@@ -8,19 +8,19 @@ import (
 	"github.com/spf13/afero"
 )
 
-// printDirIndent prints indent + entry name for files
+// printDirIndent prints indent + entry name for files.
 func printIndent(entry string, depth int) string {
 	indent := strings.Repeat("|    ", depth)
 	return fmt.Sprintf("%s|── %s\n", indent, entry)
 }
 
-// printDirIndent prints indent + entry name for dirs
+// printDirIndent prints indent + entry name for dirs.
 func printDirIndent(entry string, depth int) string {
 	indent := strings.Repeat("|    ", depth)
 	return fmt.Sprintf("%s|── %s/\n", indent, entry)
 }
 
-// printDir prints recursively directory to mimic tree command
+// printDir prints recursively directory to mimic tree command.
 func printDir(fs afero.Fs, path, rootPath string, depth int, buf *strings.Builder) error {
 	entries, err := afero.ReadDir(fs, path)
 	if err != nil {
@@ -60,7 +60,7 @@ func printDir(fs afero.Fs, path, rootPath string, depth int, buf *strings.Builde
 
 }
 
-// GetDirTree is a recursive function to list directory content as a tree
+// GetDirTree is a recursive function to list directory content as a tree.
 func GetDirTree(fs afero.Fs, path string) (string, error) {
 	buf := new(strings.Builder)
 	rootPath := path

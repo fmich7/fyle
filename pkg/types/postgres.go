@@ -1,6 +1,6 @@
 package types
 
-// PostgresCredentials represents credentials for connecting to Postgres database
+// PostgresCredentials represents credentials for connecting to Postgres database.
 type PostgresCredentials struct {
 	DB_USER     string
 	DB_PASSWORD string

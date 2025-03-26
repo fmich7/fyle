@@ -19,7 +19,12 @@ func TestNewDiskStorage(t *testing.T) {
 	wd, err := os.Getwd()
 	require.NoError(t, err, "failed to get working directory: %v", err)
 
-	assert.Equal(t, filepath.Join(wd, "uploads"), storage.GetFileUploadsLocation(), "unexpected file upload location")
+	assert.Equal(
+		t,
+		filepath.Join(wd, "uploads"),
+		storage.GetFileUploadsLocation(),
+		"unexpected file upload location",
+	)
 }
 
 func TestStoreFile(t *testing.T) {
@@ -72,7 +77,12 @@ func TestRetrieveFile(t *testing.T) {
 	retrievedContent, err := afero.ReadAll(reader)
 	require.NoError(t, err, "failed to read retrieved file content: %v", err)
 
-	assert.Equal(t, content, retrievedContent, "retrieved file content does not match original content")
+	assert.Equal(
+		t,
+		content,
+		retrievedContent,
+		"retrieved file content does not match original content",
+	)
 }
 
 func TestGetFileUploadsLocation(t *testing.T) {

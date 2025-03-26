@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewLogin creates a new login command
+// NewLogin creates a new login command.
 func (c *CliClient) NewLoginCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "login [username] [password]",
@@ -32,7 +32,7 @@ func (c *CliClient) NewLoginCmd() *cobra.Command {
 	}
 }
 
-// LoginUser sends credentials to the server to login and store JWT token
+// LoginUser sends credentials to the server to login and store JWT token.
 func (c *CliClient) LoginUser(username, password string) error {
 	if username == "" {
 		return errors.New("username argument is empty")
@@ -74,7 +74,7 @@ func (c *CliClient) LoginUser(username, password string) error {
 	return nil
 }
 
-// makeLoginRequest makes login request to the server
+// makeLoginRequest makes login request to the server.
 func (c *CliClient) makeLoginRequest(username, password string) ([]byte, error) {
 	body := new(bytes.Buffer)
 	err := json.NewEncoder(body).Encode(types.AuthUserRequest{

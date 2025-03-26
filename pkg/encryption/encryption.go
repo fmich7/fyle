@@ -10,21 +10,21 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-// GeneratePBEKey generates a 32-byte encryption key for PBE with salt
-// This key is used to encrypt/decrypt user files uploaded to the server
-// The key itself is stored in the keyring
+// GeneratePBEKey generates a 32-byte encryption key for PBE with salt.
+// This key is used to encrypt/decrypt user files uploaded to the server.
+// The key itself is stored in the keyring.
 func GeneratePBEKey(password string, salt []byte) []byte {
 	return argon2.IDKey([]byte(password), salt, 1, 64*1024, 4, 32)
 }
 
-// GenerateRandomNBytes generates a random byte slice of length n
+// GenerateRandomNBytes generates a random byte slice of length n.
 func GenerateRandomNBytes(n int) ([]byte, error) {
 	bytes := make([]byte, n)
 	_, err := rand.Read(bytes)
 	return bytes, err
 }
 
-// EncryptData encrypts data using AES-GCM with nonce (4KB chunks)
+// EncryptData encrypts data using AES-GCM with nonce (4KB chunks).
 func EncryptData(data io.Reader, encryptionKey []byte) io.Reader {
 	pr, pw := io.Pipe()
 
@@ -78,7 +78,7 @@ func EncryptData(data io.Reader, encryptionKey []byte) io.Reader {
 	return pr
 }
 
-// DecryptData decrypts data using AES-GCM with nonce (4KB size)
+// DecryptData decrypts data using AES-GCM with nonce (4KB size).
 func DecryptData(data io.Reader, decryptionKey []byte) io.Reader {
 	pr, pw := io.Pipe()
 

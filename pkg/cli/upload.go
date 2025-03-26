@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewUploadCmd creates a new upload command
+// NewUploadCmd creates a new upload command.
 func (c *CliClient) NewUploadCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "upload [localPath] [serverPath]",
@@ -32,7 +32,7 @@ func (c *CliClient) NewUploadCmd() *cobra.Command {
 	}
 }
 
-// UploadFile sends file to the server
+// UploadFile sends file to the server.
 func (c *CliClient) UploadFile(localPath, serverPath string) error {
 	jwtTokenBytes, err := c.getKeyringValue("jwt_token")
 	if err != nil {
@@ -83,8 +83,7 @@ func (c *CliClient) UploadFile(localPath, serverPath string) error {
 	return nil
 }
 
-// PrepareMultipartForm prepares a multipart request
-// It writes filepath, and file data in chunks
+// PrepareMultipartForm writes filepath, and file data in chunks to a multipart request.
 func (c *CliClient) PrepareMultipartForm(
 	localPath, serverPath string, encryptionKey []byte,
 ) (*types.MultiPartForm, error) {

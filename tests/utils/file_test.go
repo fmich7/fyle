@@ -15,13 +15,13 @@ import (
 func TestGetBaseDir(t *testing.T) {
 	assert := assert.New(t)
 
-	// Test with an existing directory
+	// test with an existing directory
 	tempDir := t.TempDir()
 	baseDir, err := utils.GetBaseDir(tempDir)
 	assert.NoError(err, "expected no error")
 	assert.Equal(tempDir, baseDir, "expected base directory to match input directory")
 
-	// Test with a file inside the directory
+	// test with a file inside the directory
 	tempFile := filepath.Join(tempDir, "testfile.txt")
 	err = os.WriteFile(tempFile, []byte("test content"), 0644)
 	assert.NoError(err, "failed to create temp file")
@@ -30,7 +30,7 @@ func TestGetBaseDir(t *testing.T) {
 	assert.NoError(err, "expected no error")
 	assert.Equal(tempDir, baseDir, "expected base directory to be parent of the file")
 
-	// Test with a non-existent path
+	// test with a non-existent path
 	nonExistentPath := filepath.Join(tempDir, "LOL")
 	baseDir, err = utils.GetBaseDir(nonExistentPath)
 	assert.NoError(err, "expected no error for non-existent file")
@@ -68,23 +68,29 @@ func TestValidatePath(t *testing.T) {
 		constructedPath  string
 		expectedValidity bool
 	}{
-		// Valid paths
+		// valid paths
 		{"/home/user/storage", "/home/user/storage/file.txt", true},
 		{"/home/user/storage", "/home/user/storage/folder", true},
 		{"/home/user/storage", "/home/user/storage/folder/file.txt", true},
 
-		// Invalid paths (directory traversal)
+		// invalid paths (directory traversal)
 		{"/home/user/storage", "/home/user/other/file.txt", false},
 		{"/home/user/storage", "/home/user/../../etc/passwd", false},
 
-		// Edge cases
+		// edge cases
 		{"/home/user/storage", "/home/user/storage/../file.txt", false},
 		{"/home/user/storage", "/home/user/storage/./file.txt", true},
 	}
 
 	for _, test := range tests {
 		result := utils.ValidatePath(test.storageRootPath, test.constructedPath)
-		assert.Equal(test.expectedValidity, result, "Failed for path: %s with root: %s", test.constructedPath, test.storageRootPath)
+		assert.Equal(
+			test.expectedValidity,
+			result,
+			"Failed for path: %s with root: %s",
+			test.constructedPath,
+			test.storageRootPath,
+		)
 	}
 }
 
@@ -114,10 +120,15 @@ func TestLocationOnServer(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.expected, func(t *testing.T) {
-			// Call the function being tested
-			safePath, ok := utils.GetLocationOnServer(test.baseDir, test.user, test.location, test.filename)
+			// call the function being tested
+			safePath, ok := utils.GetLocationOnServer(
+				test.baseDir,
+				test.user,
+				test.location,
+				test.filename,
+			)
 
-			// Check if the function returned the expected result
+			// check if the function returned the expected result
 			assert.True(t, ok)
 			assert.Equal(t, test.expected, safePath)
 		})
@@ -125,11 +136,11 @@ func TestLocationOnServer(t *testing.T) {
 }
 
 func TestLocationOnServerUnsafe(t *testing.T) {
-	// Get the absolute path of the current working directory
+	// get the absolute path of the current working directory
 	baseDirAbs, err := os.Getwd()
 	assert.NoError(t, err, "couldn't get working dir")
 
-	// Define the root storage path
+	// define the root storage path
 	storageRootAbsPath := filepath.Join(baseDirAbs, "uploads")
 
 	tests := []struct {
@@ -150,8 +161,12 @@ func TestLocationOnServerUnsafe(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			// Call the function being tested
-			_, ok := utils.GetLocationOnServer(test.rootAbsPath, test.username, test.subfolders, test.filename)
+			_, ok := utils.GetLocationOnServer(
+				test.rootAbsPath,
+				test.username,
+				test.subfolders,
+				test.filename,
+			)
 			assert.False(t, ok)
 		})
 	}
@@ -227,29 +242,25 @@ func TestGetFileNameFromContentDisposition(t *testing.T) {
 func TestSaveFileOnDisk(t *testing.T) {
 	assert := assert.New(t)
 	afs := afero.NewMemMapFs()
-
-	// Create a temporary directory in afero
 	tempDir := "/temp"
 	filename := "testttt.txt"
 	path := filepath.Join(tempDir, filename)
 	content := []byte("mega content")
 	contentReader := io.NopCloser(bytes.NewReader(content))
 
-	// Test: should be created successfully
+	// should be created successfully
 	err := utils.SaveFileOnDisk(afs, tempDir, filename, contentReader)
 	assert.NoError(err, "Expected no error when saving file that doesn't exist")
-
-	// Verify that file is indeed created in the in-memory filesystem
 	exists, err := afero.Exists(afs, path)
 	assert.NoError(err)
 	assert.True(exists, "Expected file to be created")
 
-	// Test: should return error when file already exists
+	// should return error when file already exists
 	contentReader = io.NopCloser(bytes.NewReader(content))
 	err = utils.SaveFileOnDisk(afs, tempDir, filename, contentReader)
 	assert.Error(err, "Expected error when saving file that already exists")
 
-	// Test: does file content match?
+	// does file content match?
 	file, err := afero.ReadFile(afs, path)
 	assert.NoError(err, "Failed to read file from afero")
 	assert.Equal(content, file, "File content does not match")

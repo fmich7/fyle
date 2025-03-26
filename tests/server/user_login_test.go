@@ -32,17 +32,17 @@ func TestLoginUser(t *testing.T) {
 	require.NoError(t, err, "creating user")
 	db.StoreUser(newUser)
 
-	// Good password
+	// good password
 	token, err := mockServer.LoginUser(username, password)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, token)
 
-	// Wrong password
+	// wrong password
 	token, err = mockServer.LoginUser(username, "asdads")
 	assert.Error(t, err)
 	assert.Empty(t, token)
 
-	// User not found
+	// user not found
 	token, err = mockServer.LoginUser("asdsad", password)
 	assert.Error(t, err)
 	assert.Empty(t, token)
@@ -73,7 +73,7 @@ func TestHandleLogin(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, rec.Code)
 	assert.Contains(t, rec.Body.String(), "error invalid credentials")
 
-	// Valid login request
+	// valid login request
 	username := "testuser"
 	password := "password"
 
