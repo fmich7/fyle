@@ -9,8 +9,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/fmich7/fyle/pkg/encryption"
-	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/server"
+	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +45,7 @@ func (c *CliClient) LoginUser(username, password string) error {
 		return err
 	}
 
-	loginCredentials := new(types.LoginResponse)
+	loginCredentials := new(server.LoginResponse)
 	if err = json.Unmarshal(data, loginCredentials); err != nil {
 		return errors.New("failed to unmarshal server response")
 	}
@@ -63,7 +63,7 @@ func (c *CliClient) LoginUser(username, password string) error {
 	}
 
 	// generate symmetric key from password and salt
-	encryptionKey := encryption.GeneratePBEKey(password, salt)
+	encryptionKey := utils.GeneratePBEKey(password, salt)
 
 	// store encryption key
 	err = c.setKeyringValue("encryption_key", encryptionKey)
@@ -77,7 +77,7 @@ func (c *CliClient) LoginUser(username, password string) error {
 // makeLoginRequest makes login request to the server.
 func (c *CliClient) makeLoginRequest(username, password string) ([]byte, error) {
 	body := new(bytes.Buffer)
-	err := json.NewEncoder(body).Encode(types.AuthUserRequest{
+	err := json.NewEncoder(body).Encode(server.AuthUserRequest{
 		Username: username,
 		Password: password,
 	})

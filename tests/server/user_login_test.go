@@ -11,7 +11,6 @@ import (
 	"github.com/fmich7/fyle/pkg/config"
 	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/storage"
-	"github.com/fmich7/fyle/pkg/types"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -57,7 +56,7 @@ func TestHandleLogin(t *testing.T) {
 	mockServer := server.NewServer(cfg, db)
 
 	// invalid credentials
-	requestBody, err := json.Marshal(types.AuthUserRequest{
+	requestBody, err := json.Marshal(server.AuthUserRequest{
 		Username: "testuser",
 		Password: "wrongpassword",
 	})
@@ -81,7 +80,7 @@ func TestHandleLogin(t *testing.T) {
 	require.NoError(t, err, "creating user")
 	db.StoreUser(newUser)
 
-	requestBodyValid, err := json.Marshal(types.AuthUserRequest{
+	requestBodyValid, err := json.Marshal(server.AuthUserRequest{
 		Username: username,
 		Password: password,
 	})

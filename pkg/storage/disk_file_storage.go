@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/file"
 	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/afero"
 )
@@ -48,7 +48,7 @@ func NewDiskFileStorage(fileUploadsLocation string, fs afero.Fs) (*DiskFileStora
 }
 
 // UploadFile creates a file in the disk storage.
-func (d *DiskFileStorage) StoreFile(file *types.File) error {
+func (d *DiskFileStorage) StoreFile(file *file.File) error {
 	defer file.Data.Close()
 
 	// create file in disk storage
@@ -75,7 +75,7 @@ func (d *DiskFileStorage) RetrieveFile(path string) (io.ReadCloser, error) {
 
 // createFile creates a file in the disk storage.
 // It creates the directory if it doesn't exist.
-func (d *DiskFileStorage) createFile(file *types.File) (afero.File, error) {
+func (d *DiskFileStorage) createFile(file *file.File) (afero.File, error) {
 	dirPath := filepath.Dir(file.Location)
 
 	// check if the directory exists, and create it if it doesn't

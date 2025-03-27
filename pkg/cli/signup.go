@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/server"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +39,7 @@ func (c *CliClient) SignUPUser(username, password string) error {
 	}
 
 	body := new(bytes.Buffer)
-	err := json.NewEncoder(body).Encode(types.AuthUserRequest{
+	err := json.NewEncoder(body).Encode(server.AuthUserRequest{
 		Username: username,
 		Password: password,
 	})

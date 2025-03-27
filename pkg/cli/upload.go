@@ -7,8 +7,8 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/fmich7/fyle/pkg/encryption"
-	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/file"
+	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -86,7 +86,7 @@ func (c *CliClient) UploadFile(localPath, serverPath string) error {
 // PrepareMultipartForm writes filepath, and file data in chunks to a multipart request.
 func (c *CliClient) PrepareMultipartForm(
 	localPath, serverPath string, encryptionKey []byte,
-) (*types.MultiPartForm, error) {
+) (*file.MultiPartForm, error) {
 	r, w := io.Pipe()
 	m := multipart.NewWriter(w)
 
@@ -114,7 +114,7 @@ func (c *CliClient) PrepareMultipartForm(
 		defer file.Close()
 
 		// encrypt file in chunks (stream)
-		encryptionFileStream := encryption.EncryptData(file, encryptionKey)
+		encryptionFileStream := utils.EncryptData(file, encryptionKey)
 
 		if _, err := io.Copy(formFile, encryptionFileStream); err != nil {
 			w.CloseWithError(fmt.Errorf("error copying encrypted data: %v", err))
@@ -127,7 +127,7 @@ func (c *CliClient) PrepareMultipartForm(
 		}
 	}()
 
-	return &types.MultiPartForm{
+	return &file.MultiPartForm{
 		FormData:            r,
 		FormDataContentType: m.FormDataContentType(),
 	}, nil

@@ -10,7 +10,6 @@ import (
 	"github.com/fmich7/fyle/pkg/config"
 	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/storage"
-	"github.com/fmich7/fyle/pkg/types"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -24,8 +23,8 @@ func TestHandleSignUp(t *testing.T) {
 	cfg := config.NewTestingConfig()
 	mockServer := server.NewServer(cfg, db)
 
-	// invalid signup request
-	requestBody, err := json.Marshal(types.AuthUserRequest{
+	// Invalid signup request
+	requestBody, err := json.Marshal(server.AuthUserRequest{
 		Username: "",
 		Password: "password123",
 	})

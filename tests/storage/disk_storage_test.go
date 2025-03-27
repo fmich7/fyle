@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/fmich7/fyle/pkg/file"
 	"github.com/fmich7/fyle/pkg/storage"
-	"github.com/fmich7/fyle/pkg/types"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -38,13 +38,13 @@ func TestStoreFile(t *testing.T) {
 	err = afero.WriteFile(afs, filename, content, 0777)
 	require.NoError(t, err, "failed to create test file: %v", err)
 
-	file, err := afs.Open(filename)
+	oFile, err := afs.Open(filename)
 	require.NoError(t, err, "failed to open test file: %v", err)
 
 	targetFilename := "TESTME.txt"
-	f := types.File{
+	f := file.File{
 		Location: targetFilename,
-		Data:     file,
+		Data:     oFile,
 	}
 
 	err = storage.StoreFile(&f)

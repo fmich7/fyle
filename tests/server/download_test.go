@@ -12,7 +12,6 @@ import (
 	"github.com/fmich7/fyle/pkg/config"
 	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/storage"
-	"github.com/fmich7/fyle/pkg/types"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,8 +36,8 @@ func TestHandleFileDownload(t *testing.T) {
 		"Expected no error writing file",
 	)
 
-	// create server
-	server := server.NewServer(config.NewTestingConfig(), storage)
+	// create srv
+	srv := server.NewServer(config.NewTestingConfig(), storage)
 
 	// sendRequest with injected username
 	sendRequest := func(t *testing.T, path string) *httptest.ResponseRecorder {
@@ -46,7 +45,7 @@ func TestHandleFileDownload(t *testing.T) {
 		body := new(bytes.Buffer)
 		require.NoError(
 			t,
-			json.NewEncoder(body).Encode(types.DownloadRequest{Path: path}),
+			json.NewEncoder(body).Encode(server.DownloadRequest{Path: path}),
 			"Expected no error marshalling request data",
 		)
 
@@ -58,7 +57,7 @@ func TestHandleFileDownload(t *testing.T) {
 		req = req.WithContext(ctx)
 
 		rec := httptest.NewRecorder()
-		server.HandleFileDownload(rec, req)
+		srv.HandleFileDownload(rec, req)
 
 		return rec
 	}

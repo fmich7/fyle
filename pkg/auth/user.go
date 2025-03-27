@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 
-	"github.com/fmich7/fyle/pkg/encryption"
+	"github.com/fmich7/fyle/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,7 +27,7 @@ func NewUser(username, password string) (*User, error) {
 		return nil, err
 	}
 
-	salt, err := encryption.GenerateRandomNBytes(16)
+	salt, err := utils.GenerateRandomNBytes(16)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,6 @@ func NewUser(username, password string) (*User, error) {
 		Password: hashedPassword,
 		Salt:     base64.StdEncoding.EncodeToString(salt),
 	}, nil
-
 }
 
 // CheckPassword checks if user provided valid password.

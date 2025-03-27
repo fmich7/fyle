@@ -3,15 +3,13 @@ package server
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/fmich7/fyle/pkg/types"
 )
 
 // HandleListFiles returns user file tree.
 func (s *Server) HandleListFiles(w http.ResponseWriter, r *http.Request) {
 	username := r.Context().Value("username").(string)
 
-	var reqBody types.ListFilesRequest
+	var reqBody ListFilesRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "decoding request body", http.StatusBadRequest)
 		return

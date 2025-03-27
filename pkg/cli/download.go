@@ -8,8 +8,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/fmich7/fyle/pkg/encryption"
-	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/file"
+	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -45,7 +45,7 @@ func (c *CliClient) NewDownloadCmd() *cobra.Command {
 // DownloadFile makes request to download specific file from the server.
 func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	body := new(bytes.Buffer)
-	if err := json.NewEncoder(body).Encode(types.DownloadRequest{Path: serverPath}); err != nil {
+	if err := json.NewEncoder(body).Encode(server.DownloadRequest{Path: serverPath}); err != nil {
 		return errors.New("failed to create request body")
 	}
 
@@ -98,9 +98,9 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 	}
 
 	// make decryption stream from response content
-	decryptionFileStream := encryption.DecryptData(res.Body, encryptionKey)
+	decryptionFileStream := utils.DecryptData(res.Body, encryptionKey)
 
-	err = utils.SaveFileOnDisk(c.fs, localPath, filename, decryptionFileStream)
+	err = file.SaveFileOnDisk(c.fs, localPath, filename, decryptionFileStream)
 	if err != nil {
 		return fmt.Errorf("failed to save file on disk %w", err)
 	}

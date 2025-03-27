@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/fmich7/fyle/pkg/auth"
-	"github.com/fmich7/fyle/pkg/types"
 )
 
 // HandleSignUp handles sign up request.
@@ -14,7 +13,7 @@ func (s *Server) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	// get info from request
-	var usrRequest types.AuthUserRequest
+	var usrRequest AuthUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&usrRequest); err != nil {
 		log.Println(err)
 		http.Error(w, "failed to decode request body", http.StatusBadRequest)

@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/fmich7/fyle/pkg/auth"
-	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/file"
 )
 
 // Storage represents a storage interface for server.
@@ -15,7 +15,7 @@ type Storage interface {
 
 // FileStorage represents file related methods.
 type FileStorage interface {
-	StoreFile(file *types.File) error
+	StoreFile(file *file.File) error
 	RetrieveFile(path string) (io.ReadCloser, error)
 	GetFileUploadsLocation() string
 	GetUserFileTree(string, string) (string, error)

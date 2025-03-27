@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/fmich7/fyle/pkg/types"
 	"github.com/fmich7/fyle/pkg/utils"
 )
 
@@ -16,7 +15,7 @@ func (s *Server) HandleFileDownload(w http.ResponseWriter, r *http.Request) {
 	log.Println("Downloading file")
 
 	username := r.Context().Value("username").(string)
-	var reqBody types.DownloadRequest
+	var reqBody DownloadRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "decoding request body", http.StatusBadRequest)
 		return

@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/server"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +32,7 @@ func (c *CliClient) NewListTreeCmd() *cobra.Command {
 // ListFiles makes request to list user's storage file structure.
 func (c *CliClient) ListFiles(path string) error {
 	body := new(bytes.Buffer)
-	if err := json.NewEncoder(body).Encode(types.ListFilesRequest{Path: path}); err != nil {
+	if err := json.NewEncoder(body).Encode(server.ListFilesRequest{Path: path}); err != nil {
 		return errors.New("failed to create request body")
 	}
 

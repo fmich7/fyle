@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/file"
 	"github.com/fmich7/fyle/pkg/utils"
 )
 
@@ -38,7 +38,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create a new file and store it on the server
-	file := types.NewFile(fileMetadata, fileData, username, safePath)
+	file := file.NewFile(fileMetadata, fileData, username, safePath)
 	if err := s.store.StoreFile(file); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

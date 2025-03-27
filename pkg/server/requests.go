@@ -1,4 +1,4 @@
-package types
+package server
 
 // LoginResponse contains data that is returned to client after login.
 type LoginResponse struct {

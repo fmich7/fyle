@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/fmich7/fyle/pkg/auth"
-	"github.com/fmich7/fyle/pkg/types"
+	"github.com/fmich7/fyle/pkg/config"
 
 	_ "github.com/lib/pq"
 )
@@ -23,7 +23,7 @@ type PQUserStorage struct {
 }
 
 // NewPQUserStorage creates a new user storage.
-func NewPQUserStorage(c types.PostgresCredentials) (*PQUserStorage, error) {
+func NewPQUserStorage(c config.PostgresCredentials) (*PQUserStorage, error) {
 	connStr := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		c.DB_USER,

@@ -6,11 +6,10 @@ import (
 	"net/http"
 
 	"github.com/fmich7/fyle/pkg/auth"
-	"github.com/fmich7/fyle/pkg/types"
 )
 
 // LoginUser return jwt token if user exists and password is correct.
-func (s *Server) LoginUser(username, password string) (*types.LoginResponse, error) {
+func (s *Server) LoginUser(username, password string) (*LoginResponse, error) {
 	usr, err := s.store.RetrieveUser(username)
 	if err != nil {
 		return nil, err
@@ -27,7 +26,7 @@ func (s *Server) LoginUser(username, password string) (*types.LoginResponse, err
 		return nil, err
 	}
 
-	return &types.LoginResponse{
+	return &LoginResponse{
 		Token: token,
 		Salt:  usr.Salt,
 	}, nil
@@ -38,7 +37,7 @@ func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	// get info from request
-	var usrRequest types.AuthUserRequest
+	var usrRequest AuthUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&usrRequest); err != nil {
 		log.Println(err)
 		http.Error(w, "error decoding request body", http.StatusBadRequest)
@@ -54,7 +53,7 @@ func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// send back token and salt
-	jsonData, err := json.Marshal(types.LoginResponse{
+	jsonData, err := json.Marshal(LoginResponse{
 		Token: loginCredentials.Token,
 		Salt:  loginCredentials.Salt,
 	})

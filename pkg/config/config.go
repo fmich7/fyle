@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/fmich7/fyle/pkg/types"
 	"github.com/joho/godotenv"
 )
 
@@ -14,7 +13,7 @@ type Config struct {
 	JWTsecretKey        string
 	UploadsLocation     string
 	MigrationPath       string
-	PostgresCredentials types.PostgresCredentials
+	PostgresCredentials PostgresCredentials
 }
 
 // LoadConfig loads config from .env file.
@@ -44,8 +43,8 @@ func getEnv(key, defaultValue string) string {
 }
 
 // getPostgresCredentials returns credentials that are used to connect to db.
-func getPostgresCredentials() types.PostgresCredentials {
-	return types.PostgresCredentials{
+func getPostgresCredentials() PostgresCredentials {
+	return PostgresCredentials{
 		DB_USER:     getEnv("POSTGRES_USER", "admin"),
 		DB_PASSWORD: getEnv("POSTGRES_PASSWORD", "root"),
 		DB_NAME:     getEnv("POSTGRES_NAME", "fyleDB"),

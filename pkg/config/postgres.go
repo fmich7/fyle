@@ -1,4 +1,4 @@
-package types
+package config
 
 // PostgresCredentials represents credentials for connecting to Postgres database.
 type PostgresCredentials struct {

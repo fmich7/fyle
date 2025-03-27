@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/fmich7/fyle/pkg/file"
 	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
@@ -249,7 +250,7 @@ func TestSaveFileOnDisk(t *testing.T) {
 	contentReader := io.NopCloser(bytes.NewReader(content))
 
 	// should be created successfully
-	err := utils.SaveFileOnDisk(afs, tempDir, filename, contentReader)
+	err := file.SaveFileOnDisk(afs, tempDir, filename, contentReader)
 	assert.NoError(err, "Expected no error when saving file that doesn't exist")
 	exists, err := afero.Exists(afs, path)
 	assert.NoError(err)
@@ -257,7 +258,7 @@ func TestSaveFileOnDisk(t *testing.T) {
 
 	// should return error when file already exists
 	contentReader = io.NopCloser(bytes.NewReader(content))
-	err = utils.SaveFileOnDisk(afs, tempDir, filename, contentReader)
+	err = file.SaveFileOnDisk(afs, tempDir, filename, contentReader)
 	assert.Error(err, "Expected error when saving file that already exists")
 
 	// does file content match?

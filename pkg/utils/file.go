@@ -2,13 +2,9 @@ package utils
 
 import (
 	"errors"
-	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/spf13/afero"
 )
 
 // GetBaseDir returns absolute path without filename (parent folder).
@@ -120,35 +116,4 @@ func GetFileNameFromContentDisposition(header string) (string, error) {
 	}
 
 	return "", errors.New("invalid header")
-}
-
-// SaveFileOnDisk saves file on disk given its path and content.
-// It will not overwrite existing files on your disk.
-func SaveFileOnDisk(fs afero.Fs, path, filename string, content io.Reader) error {
-	newFilePath := JoinPathParts(path, filename)
-
-	// ensure the directory exists
-	if err := fs.MkdirAll(path, os.ModePerm); err != nil {
-		return fmt.Errorf("failed to create directory %s: %w", path, err)
-	}
-
-	// check if the file already exists
-	if _, err := fs.Stat(newFilePath); !os.IsNotExist(err) {
-		return fmt.Errorf("file %s already exists", newFilePath)
-	}
-
-	// create the new file
-	file, err := fs.Create(newFilePath)
-	if err != nil {
-		return fmt.Errorf("failed to create file %s: %v", newFilePath, err)
-	}
-	defer file.Close()
-
-	// copy the content to the file
-	_, err = io.Copy(file, content)
-	if err != nil {
-		return errors.New("copying data to file")
-	}
-
-	return nil
 }
