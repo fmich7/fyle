@@ -25,8 +25,6 @@ func (c *CliClient) NewLoginCmd() *cobra.Command {
 			password := args[1]
 			if err := c.LoginUser(username, password); err != nil {
 				fmt.Fprintf(cmd.ErrOrStderr(), "error: %v", err)
-			} else {
-				fmt.Fprintf(cmd.OutOrStdout(), "Logged in successfully!")
 			}
 		},
 	}
@@ -71,7 +69,8 @@ func (c *CliClient) LoginUser(username, password string) error {
 		return err
 	}
 
-	return nil
+	_, err = fmt.Fprintf(c.rootCmd.OutOrStdout(), "Logged in successfully!")
+	return err
 }
 
 // makeLoginRequest makes login request to the server.

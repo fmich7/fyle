@@ -23,8 +23,6 @@ func (c *CliClient) NewSignUPCmd() *cobra.Command {
 			password := args[1]
 			if err := c.SignUPUser(username, password); err != nil {
 				fmt.Fprintf(cmd.ErrOrStderr(), "error: %v", err)
-			} else {
-				fmt.Fprintf(cmd.OutOrStdout(), "Created new account successfully!")
 			}
 		},
 	}
@@ -72,5 +70,6 @@ func (c *CliClient) SignUPUser(username, password string) error {
 		return errors.New(string(msg))
 	}
 
-	return nil
+	_, err = fmt.Fprintf(c.rootCmd.OutOrStdout(), "Created new account successfully!")
+	return err
 }

@@ -31,3 +31,16 @@ func TestValidateToken(t *testing.T) {
 	err = ValidateToken(SECRET, invalidToken)
 	assert.Error(t, err)
 }
+
+func TestParseToken(t *testing.T) {
+	username := "test"
+	validToken, err := CreateToken(SECRET, username)
+	require.NoError(t, err, "CreateToken should not return an error")
+
+	_, err = ParseToken(SECRET, validToken)
+	assert.NoError(t, err, "Error parsing token")
+
+	invalidToken := validToken + "asd"
+	_, err = ParseToken(SECRET, invalidToken)
+	assert.Error(t, err)
+}

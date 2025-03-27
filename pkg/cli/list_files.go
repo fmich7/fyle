@@ -70,7 +70,6 @@ func (c *CliClient) ListFiles(path string) error {
 		return errors.New(string(msg))
 	}
 
-	fmt.Printf("Your storage tree:\n%s", string(msg))
-
-	return nil
+	_, err = fmt.Fprintf(c.rootCmd.OutOrStdout(), "Your storage tree:\n%s", string(msg))
+	return err
 }

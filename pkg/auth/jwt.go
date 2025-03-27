@@ -33,7 +33,6 @@ func ValidateToken(secret, tokenString string) error {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})
-
 	if err != nil {
 		return err
 	}
@@ -50,7 +49,7 @@ func ParseToken(secret, tokenString string) (*AuthClaims, error) {
 	token, err := jwt.ParseWithClaims(
 		tokenString,
 		&AuthClaims{},
-		func(t *jwt.Token) (interface{}, error) {
+		func(t *jwt.Token) (any, error) {
 			return []byte(secret), nil
 		},
 	)
