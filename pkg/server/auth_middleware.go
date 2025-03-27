@@ -8,6 +8,9 @@ import (
 	"github.com/fmich7/fyle/pkg/auth"
 )
 
+// https://golang.org/pkg/context/#WithValue
+type CtxUsernameKey struct{}
+
 // AuthMiddleware extracts jwt authorization token from headers and passes it in ctx.
 func (s *Server) AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +33,7 @@ func (s *Server) AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "username", claims.Username)
+		ctx := context.WithValue(r.Context(), CtxUsernameKey{}, claims.Username)
 		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)

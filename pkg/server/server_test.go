@@ -5,12 +5,11 @@ import (
 	"time"
 
 	"github.com/fmich7/fyle/pkg/config"
-	"github.com/fmich7/fyle/pkg/server"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestStart(t *testing.T) {
-	s := server.NewServer(config.NewTestingConfig(), nil)
+	s := NewServer(config.NewTestingConfig(), nil)
 	errCh := make(chan error, 1)
 	defer close(errCh)
 

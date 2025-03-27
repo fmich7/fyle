@@ -1,11 +1,10 @@
-package cli_test
+package cli
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/fmich7/fyle/pkg/cli"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -13,7 +12,7 @@ import (
 
 func TestNewUploadCmd_ValidArgs(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	client := cli.NewCliClient(fs)
+	client := NewCliClient(fs)
 
 	cmd := client.NewUploadCmd()
 	require.NotNil(t, cmd)
@@ -35,7 +34,7 @@ func mockUploadServer(expectedStatus int) *httptest.Server {
 
 func TestUploadFile_Success(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	client := cli.NewCliClient(fs)
+	client := NewCliClient(fs)
 
 	filePath := "/testfile.txt"
 	afero.WriteFile(fs, filePath, []byte("test content"), 0644)
@@ -50,7 +49,7 @@ func TestUploadFile_Success(t *testing.T) {
 
 func TestUploadFile_FailedRequest(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	client := cli.NewCliClient(fs)
+	client := NewCliClient(fs)
 
 	filePath := "/testfile.txt"
 	afero.WriteFile(fs, filePath, []byte("test content"), 0644)
@@ -64,7 +63,7 @@ func TestUploadFile_FailedRequest(t *testing.T) {
 
 func TestUploadFile_FormCreationError(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	client := cli.NewCliClient(fs)
+	client := NewCliClient(fs)
 
 	server := mockUploadServer(http.StatusCreated)
 	defer server.Close()

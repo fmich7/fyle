@@ -1,4 +1,4 @@
-package cli_test
+package cli
 
 import (
 	"io"
@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/fmich7/fyle/pkg/cli"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,7 +13,7 @@ import (
 
 func TestNewDownloadCmd_ValidArgs(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	client := cli.NewCliClient(fs)
+	client := NewCliClient(fs)
 
 	cmd := client.NewDownloadCmd()
 	require.NotNil(t, cmd)
@@ -52,11 +51,10 @@ func TestDownloadFile_Success(t *testing.T) {
 		if err != nil {
 			http.Error(w, "Error copying file content", http.StatusInternalServerError)
 		}
-
 	}))
 	defer server.Close()
 
-	cli := cli.NewCliClient(afs)
+	cli := NewCliClient(afs)
 	cli.DownloadURL = server.URL
 
 	err = cli.DownloadFile(filename, "download")
@@ -68,7 +66,7 @@ func TestDownloadFile_Success(t *testing.T) {
 
 func TestDownloadFile_FailedRequest(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	client := cli.NewCliClient(fs)
+	client := NewCliClient(fs)
 	client.DownloadURL = "http://invalid-url"
 
 	err := client.DownloadFile("server/path", "/local/path/")

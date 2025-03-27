@@ -1,4 +1,4 @@
-package server_test
+package server
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/fmich7/fyle/pkg/config"
-	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
@@ -37,7 +36,7 @@ func TestHandleFileDownload(t *testing.T) {
 	)
 
 	// create srv
-	srv := server.NewServer(config.NewTestingConfig(), storage)
+	srv := NewServer(config.NewTestingConfig(), storage)
 
 	// sendRequest with injected username
 	sendRequest := func(t *testing.T, path string) *httptest.ResponseRecorder {
@@ -45,7 +44,7 @@ func TestHandleFileDownload(t *testing.T) {
 		body := new(bytes.Buffer)
 		require.NoError(
 			t,
-			json.NewEncoder(body).Encode(server.DownloadRequest{Path: path}),
+			json.NewEncoder(body).Encode(DownloadRequest{Path: path}),
 			"Expected no error marshalling request data",
 		)
 
@@ -53,7 +52,7 @@ func TestHandleFileDownload(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 
 		// Inject username into request context
-		ctx := context.WithValue(req.Context(), "username", user)
+		ctx := context.WithValue(req.Context(), CtxUsernameKey{}, user)
 		req = req.WithContext(ctx)
 
 		rec := httptest.NewRecorder()
@@ -64,7 +63,7 @@ func TestHandleFileDownload(t *testing.T) {
 
 	// Valid file download
 	response := sendRequest(t, filename)
-	assert.Equal(http.StatusOK, response.Code, string(response.Body.Bytes()))
+	assert.Equal(http.StatusOK, response.Code, response.Body.String())
 	assert.Equal(content, response.Body.Bytes(), "Expected file content to be the same")
 
 	// Request for non-existent file

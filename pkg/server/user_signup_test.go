@@ -1,4 +1,4 @@
-package server_test
+package server
 
 import (
 	"bytes"
@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/fmich7/fyle/pkg/config"
-	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
@@ -21,10 +20,10 @@ func TestHandleSignUp(t *testing.T) {
 	require.NoError(t, err, "initializing db")
 
 	cfg := config.NewTestingConfig()
-	mockServer := server.NewServer(cfg, db)
+	mockServer := NewServer(cfg, db)
 
 	// Invalid signup request
-	requestBody, err := json.Marshal(server.AuthUserRequest{
+	requestBody, err := json.Marshal(AuthUserRequest{
 		Username: "",
 		Password: "password123",
 	})

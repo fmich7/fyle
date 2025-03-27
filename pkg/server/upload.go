@@ -16,7 +16,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "file above 10MB", http.StatusBadRequest)
 		return
 	}
-	username := r.Context().Value("username").(string)
+	username := r.Context().Value(CtxUsernameKey{}).(string)
 
 	// retrieve the file from the multipart request
 	fileData, fileMetadata, err := r.FormFile("file")

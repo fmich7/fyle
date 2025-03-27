@@ -1,10 +1,9 @@
-package utils_test
+package file
 
 import (
 	"os"
 	"testing"
 
-	"github.com/fmich7/fyle/pkg/file"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,7 +16,7 @@ func TestGetDirTree(t *testing.T) {
 	err = afero.WriteFile(afs, "/test/file", []byte(""), os.ModePerm)
 	require.NoError(t, err)
 
-	res, err := file.GetDirTree(afs, "/")
+	res, err := GetDirTree(afs, "/")
 	require.NoError(t, err)
 
 	expected := "|── ./\n|    |── test/\n|    |    |── file\n|    |    |── folder/\n"

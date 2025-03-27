@@ -7,7 +7,7 @@ import (
 
 // HandleListFiles returns user file tree.
 func (s *Server) HandleListFiles(w http.ResponseWriter, r *http.Request) {
-	username := r.Context().Value("username").(string)
+	username := r.Context().Value(CtxUsernameKey{}).(string)
 
 	var reqBody ListFilesRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {

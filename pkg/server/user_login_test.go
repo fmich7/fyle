@@ -1,4 +1,4 @@
-package server_test
+package server
 
 import (
 	"bytes"
@@ -9,7 +9,6 @@ import (
 
 	"github.com/fmich7/fyle/pkg/auth"
 	"github.com/fmich7/fyle/pkg/config"
-	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +21,7 @@ func TestLoginUser(t *testing.T) {
 	require.NoError(t, err, "initializing db")
 
 	cfg := config.NewTestingConfig()
-	mockServer := server.NewServer(cfg, db)
+	mockServer := NewServer(cfg, db)
 
 	username := "testuser"
 	password := "password"
@@ -53,10 +52,10 @@ func TestHandleLogin(t *testing.T) {
 	require.NoError(t, err, "initializing db")
 
 	cfg := config.NewTestingConfig()
-	mockServer := server.NewServer(cfg, db)
+	mockServer := NewServer(cfg, db)
 
 	// invalid credentials
-	requestBody, err := json.Marshal(server.AuthUserRequest{
+	requestBody, err := json.Marshal(AuthUserRequest{
 		Username: "testuser",
 		Password: "wrongpassword",
 	})
@@ -80,7 +79,7 @@ func TestHandleLogin(t *testing.T) {
 	require.NoError(t, err, "creating user")
 	db.StoreUser(newUser)
 
-	requestBodyValid, err := json.Marshal(server.AuthUserRequest{
+	requestBodyValid, err := json.Marshal(AuthUserRequest{
 		Username: username,
 		Password: password,
 	})

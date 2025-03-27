@@ -1,4 +1,4 @@
-package server_test
+package server
 
 import (
 	"bytes"
@@ -9,10 +9,10 @@ import (
 	"testing"
 
 	"github.com/fmich7/fyle/pkg/config"
-	"github.com/fmich7/fyle/pkg/server"
 	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHandleFileUpload(t *testing.T) {
@@ -24,8 +24,9 @@ func TestHandleFileUpload(t *testing.T) {
 	_ = writer.WriteField("location", ".")
 
 	fileWriter, err := writer.CreateFormFile("file", "testfile.txt")
-	assert.NoError(t, err, "Failed to create form file")
-	fileWriter.Write([]byte("SOME DATA!!!"))
+	require.NoError(t, err, "Failed to create form file")
+	_, err = fileWriter.Write([]byte("SOME DATA!!!"))
+	require.NoError(t, err, "Failed to write data to file")
 
 	err = writer.Close()
 	assert.NoError(t, err, "Failed to close multipart writer")
@@ -40,10 +41,10 @@ func TestHandleFileUpload(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	mockServer := server.NewServer(config.NewTestingConfig(), storage)
+	mockServer := NewServer(config.NewTestingConfig(), storage)
 
 	// call handler
-	ctx := context.WithValue(req.Context(), "username", "test")
+	ctx := context.WithValue(req.Context(), CtxUsernameKey{}, "test")
 	req = req.WithContext(ctx)
 
 	mockServer.HandleFileUpload(recorder, req)

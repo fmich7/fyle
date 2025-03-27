@@ -12,7 +12,7 @@ import (
 func (s *Server) HandleFileDownload(w http.ResponseWriter, r *http.Request) {
 	log.Println("Downloading file")
 
-	username := r.Context().Value("username").(string)
+	username := r.Context().Value(CtxUsernameKey{}).(string)
 	var reqBody DownloadRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "decoding request body", http.StatusBadRequest)

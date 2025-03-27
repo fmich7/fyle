@@ -1,9 +1,8 @@
-package auth_test
+package auth
 
 import (
 	"testing"
 
-	"github.com/fmich7/fyle/pkg/auth"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -12,7 +11,7 @@ func TestNewUser(t *testing.T) {
 	username := "testuser"
 	password := "securepassword"
 
-	user, err := auth.NewUser(username, password)
+	user, err := NewUser(username, password)
 
 	require.NoError(t, err)
 	assert.NotNil(t, user)
@@ -23,18 +22,18 @@ func TestNewUser(t *testing.T) {
 
 func TestCheckPassword_Valid(t *testing.T) {
 	password := "securepassword"
-	user, err := auth.NewUser("testuser", password)
+	user, err := NewUser("testuser", password)
 	require.NoError(t, err)
 
-	err = auth.CheckPassword(user.Password, password)
+	err = CheckPassword(user.Password, password)
 	assert.NoError(t, err, "Correct password should pass validation")
 }
 
 func TestCheckPassword_Invalid(t *testing.T) {
 	password := "securepassword"
-	user, err := auth.NewUser("testuser", password)
+	user, err := NewUser("testuser", password)
 	require.NoError(t, err)
 
-	err = auth.CheckPassword(user.Password, "wrongpassword")
+	err = CheckPassword(user.Password, "wrongpassword")
 	assert.Error(t, err, "Incorrect password should fail validation")
 }
