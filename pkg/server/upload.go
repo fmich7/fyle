@@ -5,14 +5,17 @@ import (
 	"net/http"
 
 	"github.com/fmich7/fyle/pkg/file"
-	"github.com/fmich7/fyle/pkg/utils"
 )
 
 // HandleFileUpload handles the file upload request.
 func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	log.Println("Uploading file")
 
-	r.ParseMultipartForm(10 << 20) // 10 MB max size
+	err := r.ParseMultipartForm(10 << 20) // 10 MB max size
+	if err != nil {
+		http.Error(w, "file above 10MB", http.StatusBadRequest)
+		return
+	}
 	username := r.Context().Value("username").(string)
 
 	// retrieve the file from the multipart request
@@ -25,7 +28,7 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 
 	// check if requested path is valid
 	userInputPath := r.FormValue("path")
-	safePath, valid := utils.GetLocationOnServer(
+	safePath, valid := GetLocationOnServer(
 		s.store.GetFileUploadsLocation(),
 		username,
 		userInputPath,

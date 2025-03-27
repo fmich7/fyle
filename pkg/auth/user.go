@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 
-	"github.com/fmich7/fyle/pkg/utils"
+	"github.com/fmich7/fyle/pkg/crypto"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,7 +27,7 @@ func NewUser(username, password string) (*User, error) {
 		return nil, err
 	}
 
-	salt, err := utils.GenerateRandomNBytes(16)
+	salt, err := crypto.GenerateRandomNBytes(16)
 	if err != nil {
 		return nil, err
 	}

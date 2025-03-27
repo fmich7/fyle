@@ -9,8 +9,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/fmich7/fyle/pkg/crypto"
 	"github.com/fmich7/fyle/pkg/server"
-	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -63,7 +63,7 @@ func (c *CliClient) LoginUser(username, password string) error {
 	}
 
 	// generate symmetric key from password and salt
-	encryptionKey := utils.GeneratePBEKey(password, salt)
+	encryptionKey := crypto.GeneratePBEKey(password, salt)
 
 	// store encryption key
 	err = c.setKeyringValue("encryption_key", encryptionKey)

@@ -8,9 +8,9 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/fmich7/fyle/pkg/crypto"
 	"github.com/fmich7/fyle/pkg/file"
 	"github.com/fmich7/fyle/pkg/server"
-	"github.com/fmich7/fyle/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ func (c *CliClient) NewDownloadCmd() *cobra.Command {
 				localPath = args[1]
 			}
 
-			localPath, err := utils.GetBaseDir(localPath)
+			localPath, err := server.GetBaseDir(localPath)
 			if err != nil {
 				fmt.Fprintln(cmd.ErrOrStderr(), "error: couldn't process given path")
 				return
@@ -86,7 +86,7 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 
 	// check disposition header for filename
 	dispositionHeader := res.Header.Get("Content-Disposition")
-	filename, err := utils.GetFileNameFromContentDisposition(dispositionHeader)
+	filename, err := server.GetFileNameFromContentDisposition(dispositionHeader)
 	if err != nil {
 		return errors.New("failed to get filename")
 	}
@@ -97,10 +97,10 @@ func (c *CliClient) DownloadFile(serverPath, localPath string) error {
 		return errors.New("failed to get encryption_key")
 	}
 
-	// make decryption stream from response content
-	decryptionFileStream := utils.DecryptData(res.Body, encryptionKey)
+	decryptionFileStream := crypto.DecryptData(res.Body, encryptionKey)
+	filepath := server.JoinPathParts(localPath, filename)
 
-	err = file.SaveFileOnDisk(c.fs, localPath, filename, decryptionFileStream)
+	err = file.SaveFileOnDisk(c.fs, filepath, decryptionFileStream)
 	if err != nil {
 		return fmt.Errorf("failed to save file on disk %w", err)
 	}

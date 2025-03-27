@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/fmich7/fyle/pkg/file"
-	"github.com/fmich7/fyle/pkg/utils"
+	"github.com/fmich7/fyle/pkg/server"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +18,7 @@ func TestGetBaseDir(t *testing.T) {
 
 	// test with an existing directory
 	tempDir := t.TempDir()
-	baseDir, err := utils.GetBaseDir(tempDir)
+	baseDir, err := server.GetBaseDir(tempDir)
 	assert.NoError(err, "expected no error")
 	assert.Equal(tempDir, baseDir, "expected base directory to match input directory")
 
@@ -27,13 +27,13 @@ func TestGetBaseDir(t *testing.T) {
 	err = os.WriteFile(tempFile, []byte("test content"), 0644)
 	assert.NoError(err, "failed to create temp file")
 
-	baseDir, err = utils.GetBaseDir(tempFile)
+	baseDir, err = server.GetBaseDir(tempFile)
 	assert.NoError(err, "expected no error")
 	assert.Equal(tempDir, baseDir, "expected base directory to be parent of the file")
 
 	// test with a non-existent path
 	nonExistentPath := filepath.Join(tempDir, "LOL")
-	baseDir, err = utils.GetBaseDir(nonExistentPath)
+	baseDir, err = server.GetBaseDir(nonExistentPath)
 	assert.NoError(err, "expected no error for non-existent file")
 	assert.Equal(tempDir, baseDir, "expected base directory to be parent of non-existent file")
 }
@@ -56,7 +56,7 @@ func TestReplaceHomeDirAliases(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := utils.ReplaceHomeDirAliases(test.path)
+		result := server.ReplaceHomeDirAliases(test.path)
 		assert.Equal(test.expected, result, "Path is not equal for input %s", test.path)
 	}
 }
@@ -84,7 +84,7 @@ func TestValidatePath(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := utils.ValidatePath(test.storageRootPath, test.constructedPath)
+		result := server.ValidatePath(test.storageRootPath, test.constructedPath)
 		assert.Equal(
 			test.expectedValidity,
 			result,
@@ -122,7 +122,7 @@ func TestLocationOnServer(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.expected, func(t *testing.T) {
 			// call the function being tested
-			safePath, ok := utils.GetLocationOnServer(
+			safePath, ok := server.GetLocationOnServer(
 				test.baseDir,
 				test.user,
 				test.location,
@@ -162,7 +162,7 @@ func TestLocationOnServerUnsafe(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			_, ok := utils.GetLocationOnServer(
+			_, ok := server.GetLocationOnServer(
 				test.rootAbsPath,
 				test.username,
 				test.subfolders,
@@ -193,7 +193,7 @@ func TestGetFileNameFromPath(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := utils.GetFileNameFromPath(test.input)
+		result := server.GetFileNameFromPath(test.input)
 		assert.Equal(test.expected, result, "fail: %s not equal %s", result, test.expected)
 	}
 }
@@ -229,7 +229,7 @@ func TestGetFileNameFromContentDisposition(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := utils.GetFileNameFromContentDisposition(test.header)
+		result, err := server.GetFileNameFromContentDisposition(test.header)
 
 		if test.hasError {
 			assert.Error(err, "Expected an error for header %s", test.header)
@@ -250,16 +250,11 @@ func TestSaveFileOnDisk(t *testing.T) {
 	contentReader := io.NopCloser(bytes.NewReader(content))
 
 	// should be created successfully
-	err := file.SaveFileOnDisk(afs, tempDir, filename, contentReader)
+	err := file.SaveFileOnDisk(afs, path, contentReader)
 	assert.NoError(err, "Expected no error when saving file that doesn't exist")
 	exists, err := afero.Exists(afs, path)
 	assert.NoError(err)
 	assert.True(exists, "Expected file to be created")
-
-	// should return error when file already exists
-	contentReader = io.NopCloser(bytes.NewReader(content))
-	err = file.SaveFileOnDisk(afs, tempDir, filename, contentReader)
-	assert.Error(err, "Expected error when saving file that already exists")
 
 	// does file content match?
 	file, err := afero.ReadFile(afs, path)

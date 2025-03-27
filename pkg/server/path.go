@@ -1,7 +1,6 @@
-package utils
+package server
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -57,11 +56,7 @@ func ValidatePath(storageRootPath, constructedPath string) bool {
 	path := filepath.Clean(constructedPath)
 
 	// prevent directory traversal attacks
-	if !strings.HasPrefix(path, storageRootPath) {
-		return false
-	}
-
-	return true
+	return strings.HasPrefix(path, storageRootPath)
 }
 
 // GetLocationOnServer return joined file location on the server.
@@ -93,27 +88,4 @@ func GetFileNameFromPath(path string) string {
 	}
 
 	return filepath.Base(path)
-}
-
-// GetFileNameFromContentDisposition returns filename from Content-Disposition header.
-func GetFileNameFromContentDisposition(header string) (string, error) {
-	lowerHeader := strings.ToLower(header)
-	if idx := strings.Index(lowerHeader, "filename="); idx != -1 {
-		start := idx + len("filename=")
-		filename := header[start:]
-
-		// ; after filename
-		if idx = strings.Index(filename, ";"); idx != -1 {
-			filename = filename[:idx]
-		}
-
-		// " " space after filename
-		if idx = strings.Index(filename, " "); idx != -1 {
-			filename = filename[:idx]
-		}
-
-		return strings.TrimSpace(filename), nil
-	}
-
-	return "", errors.New("invalid header")
 }

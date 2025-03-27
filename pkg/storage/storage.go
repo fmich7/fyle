@@ -18,7 +18,7 @@ type FileStorage interface {
 	StoreFile(file *file.File) error
 	RetrieveFile(path string) (io.ReadCloser, error)
 	GetFileUploadsLocation() string
-	GetUserFileTree(string, string) (string, error)
+	GetUserFileTree(string) (string, error)
 }
 
 // UserStorage represents user related methods.

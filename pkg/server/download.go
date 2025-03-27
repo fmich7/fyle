@@ -6,8 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-
-	"github.com/fmich7/fyle/pkg/utils"
 )
 
 // HandleFileDownload handles file download request.
@@ -22,10 +20,10 @@ func (s *Server) HandleFileDownload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// filename from req path
-	filename := utils.GetFileNameFromPath(reqBody.Path)
+	filename := GetFileNameFromPath(reqBody.Path)
 
 	// does file exist on the server?
-	path, valid := utils.GetLocationOnServer(
+	path, valid := GetLocationOnServer(
 		s.store.GetFileUploadsLocation(),
 		username,
 		reqBody.Path,

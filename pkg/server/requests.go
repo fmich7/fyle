@@ -1,5 +1,11 @@
 package server
 
+import (
+	"errors"
+	"io"
+	"strings"
+)
+
 // LoginResponse contains data that is returned to client after login.
 type LoginResponse struct {
 	Token string `json:"token"`
@@ -20,4 +26,33 @@ type AuthUserRequest struct {
 // ListFilesRequest contains data that is used to list files in user's dir.
 type ListFilesRequest struct {
 	Path string `json:"path"`
+}
+
+// MultiPartForm represents a multi part form.
+type MultiPartForm struct {
+	FormData            *io.PipeReader
+	FormDataContentType string
+}
+
+// GetFileNameFromContentDisposition returns filename from Content-Disposition header.
+func GetFileNameFromContentDisposition(header string) (string, error) {
+	lowerHeader := strings.ToLower(header)
+	if idx := strings.Index(lowerHeader, "filename="); idx != -1 {
+		start := idx + len("filename=")
+		filename := header[start:]
+
+		// ; after filename
+		if idx = strings.Index(filename, ";"); idx != -1 {
+			filename = filename[:idx]
+		}
+
+		// " " space after filename
+		if idx = strings.Index(filename, " "); idx != -1 {
+			filename = filename[:idx]
+		}
+
+		return strings.TrimSpace(filename), nil
+	}
+
+	return "", errors.New("invalid header")
 }

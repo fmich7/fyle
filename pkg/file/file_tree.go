@@ -1,4 +1,4 @@
-package utils
+package file
 
 import (
 	"fmt"
@@ -57,7 +57,6 @@ func printDir(fs afero.Fs, path, rootPath string, depth int, buf *strings.Builde
 	}
 
 	return nil
-
 }
 
 // GetDirTree is a recursive function to list directory content as a tree.
@@ -65,7 +64,6 @@ func GetDirTree(fs afero.Fs, path string) (string, error) {
 	buf := new(strings.Builder)
 	rootPath := path
 	err := printDir(fs, path, rootPath, 0, buf)
-
 	if err != nil {
 		return "", err
 	}
