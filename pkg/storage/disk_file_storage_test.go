@@ -1,4 +1,4 @@
-package storage_test
+package storage
 
 import (
 	"os"
@@ -6,14 +6,13 @@ import (
 	"testing"
 
 	"github.com/fmich7/fyle/pkg/file"
-	"github.com/fmich7/fyle/pkg/storage"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewDiskStorage(t *testing.T) {
-	storage, err := storage.NewDiskFileStorage("uploads", afero.NewMemMapFs())
+	storage, err := NewDiskFileStorage("uploads", afero.NewMemMapFs())
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	wd, err := os.Getwd()
@@ -29,7 +28,7 @@ func TestNewDiskStorage(t *testing.T) {
 
 func TestStoreFile(t *testing.T) {
 	afs := afero.NewMemMapFs()
-	storage, err := storage.NewDiskFileStorage("uploads", afs)
+	storage, err := NewDiskFileStorage("uploads", afs)
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	filename := "test.txt"
@@ -62,7 +61,7 @@ func TestStoreFile(t *testing.T) {
 
 func TestRetrieveFile(t *testing.T) {
 	afs := afero.NewMemMapFs()
-	storage, err := storage.NewDiskFileStorage("uploads", afs)
+	storage, err := NewDiskFileStorage("uploads", afs)
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	filename := "test.txt"
@@ -87,7 +86,7 @@ func TestRetrieveFile(t *testing.T) {
 
 func TestGetFileUploadsLocation(t *testing.T) {
 	afs := afero.NewMemMapFs()
-	storage, err := storage.NewDiskFileStorage("uploads", afs)
+	storage, err := NewDiskFileStorage("uploads", afs)
 	require.NoError(t, err, "failed to create storage: %v", err)
 
 	wd, err := os.Getwd()
@@ -95,4 +94,13 @@ func TestGetFileUploadsLocation(t *testing.T) {
 
 	expected := filepath.Join(wd, "uploads")
 	assert.Equal(t, expected, storage.GetFileUploadsLocation())
+}
+
+func TestShutdown(t *testing.T) {
+	afs := afero.NewMemMapFs()
+	storage, err := NewDiskFileStorage("uploads", afs)
+	require.NoError(t, err)
+
+	err = storage.Shutdown()
+	assert.NoError(t, err)
 }

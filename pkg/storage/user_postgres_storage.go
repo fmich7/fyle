@@ -60,7 +60,6 @@ func (d *PQUserStorage) StoreUser(user *auth.User) error {
 	`
 	var exists bool
 	err := d.db.QueryRow(existQuery, user.Username).Scan(&exists)
-
 	if err != nil {
 		return fmt.Errorf("database error: %v", err)
 	}
@@ -140,4 +139,8 @@ func (d *PQUserStorage) RunMigrations(migrationsDir string) error {
 	}
 
 	return nil
+}
+
+func (d *PQUserStorage) Shutdown() error {
+	return d.db.Close()
 }

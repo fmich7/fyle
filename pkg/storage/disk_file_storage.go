@@ -96,3 +96,7 @@ func (d *DiskFileStorage) GetFileUploadsLocation() string {
 func (d *DiskFileStorage) GetUserFileTree(path string) (string, error) {
 	return file.GetDirTree(d.fs, path)
 }
+
+func (d *DiskFileStorage) Shutdown() error {
+	return nil
+}

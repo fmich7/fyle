@@ -30,4 +30,8 @@ func TestFakeUserDB(t *testing.T) {
 	// none exsisten
 	_, err = db.RetrieveUser("nonexistent")
 	assert.Error(t, err, "expected error for non-existent user")
+
+	// shutdonw
+	err = db.Shutdown()
+	assert.NoError(t, err)
 }

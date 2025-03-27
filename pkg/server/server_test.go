@@ -5,22 +5,32 @@ import (
 	"time"
 
 	"github.com/fmich7/fyle/pkg/config"
-	"github.com/stretchr/testify/assert"
+	"github.com/fmich7/fyle/pkg/storage"
+	"github.com/spf13/afero"
+	"github.com/stretchr/testify/require"
 )
 
-func TestStart(t *testing.T) {
-	s := NewServer(config.NewTestingConfig(), nil)
-	errCh := make(chan error, 1)
-	defer close(errCh)
+func TestServerStart(t *testing.T) {
+	cfg := config.NewTestingConfig()
+	afs := afero.NewMemMapFs()
+	store, err := storage.NewTestingStorage(afs)
+	require.NoError(t, err)
 
+	srv := NewServer(cfg, store)
+
+	errCh := make(chan error, 1)
 	go func() {
-		errCh <- s.Start()
+		errCh <- srv.Start()
 	}()
 
 	select {
+	case <-time.After(200 * time.Millisecond):
 	case err := <-errCh:
-		assert.NoError(t, err, "Expected no error, got: %v", err)
-	case <-time.After(10 * time.Millisecond):
-		break
+		t.Fatalf("Failed to start server: %v", err)
 	}
+
+	port, err := srv.GetPort()
+	require.NoError(t, err, "Failed to get server port")
+	require.Greater(t, port, 0, "Invalid port assigned")
+	require.NoError(t, srv.Shutdown(), "Failed to shutdown server")
 }

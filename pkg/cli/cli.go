@@ -31,7 +31,6 @@ func NewCliClient(fs afero.Fs) *CliClient {
 		},
 		fs: fs,
 
-		// TODO: CONFIG!!!!!
 		UploadURL:          "http://localhost:3000/file",
 		DownloadURL:        "http://localhost:3000/getfile",
 		LoginURL:           "http://localhost:3000/login",

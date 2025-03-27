@@ -45,3 +45,8 @@ func (f *FakeUserDB) RetrieveUser(username string) (*auth.User, error) {
 		Password: user.Password,
 	}, nil
 }
+
+// Shutdown
+func (f *FakeUserDB) Shutdown() error {
+	return nil
+}

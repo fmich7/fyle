@@ -1,6 +1,8 @@
 package server
 
 import (
+	"fmt"
+	"net"
 	"net/http"
 
 	"github.com/fmich7/fyle/pkg/config"
@@ -10,6 +12,7 @@ import (
 // Server is a struct that represents the server.
 type Server struct {
 	listenAddr   string
+	listener     net.Listener
 	store        storage.Storage
 	jwtSecretKey string
 }
@@ -25,14 +28,42 @@ func NewServer(cfg *config.Config, store storage.Storage) *Server {
 
 // Start starts the server.
 func (s *Server) Start() error {
+	listener, err := net.Listen("tcp", s.listenAddr)
+	if err != nil {
+		return fmt.Errorf("failed to start listener: %v", err)
+	}
+
+	s.listener = listener
+
+	mux := http.NewServeMux()
 	// File related routes
-	http.HandleFunc("POST /file", s.AuthMiddleware(s.HandleFileUpload))
-	http.HandleFunc("POST /getfile", s.AuthMiddleware(s.HandleFileDownload))
-	http.HandleFunc("POST /ls", s.AuthMiddleware(s.HandleListFiles))
+	mux.HandleFunc("POST /file", s.AuthMiddleware(s.HandleFileUpload))
+	mux.HandleFunc("POST /getfile", s.AuthMiddleware(s.HandleFileDownload))
+	mux.HandleFunc("POST /ls", s.AuthMiddleware(s.HandleListFiles))
 
 	// User related routes
-	http.HandleFunc("POST /signup", s.HandleSignUp)
-	http.HandleFunc("GET /login", s.HandleLogin)
+	mux.HandleFunc("POST /signup", s.HandleSignUp)
+	mux.HandleFunc("GET /login", s.HandleLogin)
 
-	return http.ListenAndServe(s.listenAddr, nil)
+	fmt.Println("Server started on", listener.Addr().String())
+	return http.Serve(listener, mux)
+}
+
+// Shutdown gracefuly shutdowns the server
+func (s *Server) Shutdown() error {
+	if s.listener != nil {
+		if err := s.listener.Close(); err != nil {
+			return fmt.Errorf("failed to close listener: %w", err)
+		}
+	}
+	return s.store.Shutdown()
+}
+
+// GetPort returns the actual port used by the server.
+func (s *Server) GetPort() (int, error) {
+	if s.listener == nil {
+		return 0, fmt.Errorf("server is not running")
+	}
+	addr := s.listener.Addr().(*net.TCPAddr)
+	return addr.Port, nil
 }
