@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -47,7 +48,8 @@ func (s *Server) HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	response := fmt.Sprint("File uploaded successfully:", file.Owner, file.Filename)
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("File uploaded successfully"))
-	log.Println("File uploaded successfully:", file.Owner, file.Filename)
+	w.Write([]byte(response))
+	log.Println("File uploaded successfully to:", safePath)
 }

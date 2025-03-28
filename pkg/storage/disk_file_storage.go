@@ -19,29 +19,19 @@ type DiskFileStorage struct {
 
 // NewDiskFileStorage creates a new DiskStorage object.
 // fs (nil is standard filesystem), you can pass aerof.Fs object for testing.
-func NewDiskFileStorage(fileUploadsLocation string, fs afero.Fs) (*DiskFileStorage, error) {
+func NewDiskFileStorage(uploadsDirAbsPath string, fs afero.Fs) (*DiskFileStorage, error) {
 	// default to OS filesystem if none is provided
 	if fs == nil {
 		fs = afero.NewOsFs()
 	}
 
 	// create the uploads directory if it doesn't exist
-	if _, err := os.Stat(fileUploadsLocation); os.IsNotExist(err) {
-		if err := fs.Mkdir(fileUploadsLocation, os.ModePerm); err != nil {
-			return nil, fmt.Errorf("failed to create uploads directory: %v", err)
-		}
-	} else if err != nil {
-		return nil, fmt.Errorf("failed to check uploads directory: %v", err)
-	}
-
-	// get the absolute path of the file uploads location
-	rootStoragePath, err := filepath.Abs(fileUploadsLocation)
-	if err != nil {
-		return nil, fmt.Errorf("getting abs file upload location: %v", err)
+	if err := fs.MkdirAll(uploadsDirAbsPath, os.ModePerm); err != nil {
+		return nil, fmt.Errorf("failed to create uploads directory: %v", err)
 	}
 
 	return &DiskFileStorage{
-		location: rootStoragePath,
+		location: uploadsDirAbsPath,
 		fs:       fs,
 	}, nil
 }

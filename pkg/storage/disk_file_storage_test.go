@@ -12,18 +12,25 @@ import (
 )
 
 func TestNewDiskStorage(t *testing.T) {
-	storage, err := NewDiskFileStorage("uploads", afero.NewMemMapFs())
+	// afero
+	afs := afero.NewMemMapFs()
+	_, err := NewDiskFileStorage("uploads", afs)
 	require.NoError(t, err, "failed to create storage: %v", err)
+	exists, err := afero.Exists(afs, "uploads")
+	require.NoError(t, err)
+	assert.True(t, exists)
 
+	// simulate real os
 	wd, err := os.Getwd()
 	require.NoError(t, err, "failed to get working directory: %v", err)
 
-	assert.Equal(
-		t,
-		filepath.Join(wd, "uploads"),
-		storage.GetFileUploadsLocation(),
-		"unexpected file upload location",
-	)
+	path := filepath.Join(wd, "uploads")
+	_, err = NewDiskFileStorage(path, afs)
+	require.NoError(t, err, "failed to create storage: %v", err)
+
+	exists, err = afero.Exists(afs, path)
+	require.NoError(t, err)
+	assert.True(t, exists)
 }
 
 func TestStoreFile(t *testing.T) {
@@ -88,12 +95,15 @@ func TestGetFileUploadsLocation(t *testing.T) {
 	afs := afero.NewMemMapFs()
 	storage, err := NewDiskFileStorage("uploads", afs)
 	require.NoError(t, err, "failed to create storage: %v", err)
+	assert.Equal(t, "uploads", storage.GetFileUploadsLocation())
 
 	wd, err := os.Getwd()
 	require.NoError(t, err, "failed to get working directory: %v", err)
 
-	expected := filepath.Join(wd, "uploads")
-	assert.Equal(t, expected, storage.GetFileUploadsLocation())
+	path := filepath.Join(wd, "uploads")
+	storage, err = NewDiskFileStorage(path, afs)
+	require.NoError(t, err, "failed to create storage: %v", err)
+	assert.Equal(t, path, storage.GetFileUploadsLocation())
 }
 
 func TestShutdown(t *testing.T) {

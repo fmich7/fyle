@@ -78,9 +78,8 @@ func (c *CliClient) UploadFile(localPath, serverPath string) error {
 		return fmt.Errorf("uploading file: %s", string(msg))
 	}
 
-	fmt.Println("Server Response:", string(msg))
-
-	return nil
+	_, err = fmt.Fprintln(c.rootCmd.ErrOrStderr(), "Server Response:", string(msg))
+	return err
 }
 
 // PrepareMultipartForm writes filepath, and file data in chunks to a multipart request.
