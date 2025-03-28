@@ -77,7 +77,8 @@ func TestHandleLogin(t *testing.T) {
 
 	newUser, err := auth.NewUser(username, password)
 	require.NoError(t, err, "creating user")
-	db.StoreUser(newUser)
+	err = db.StoreUser(newUser)
+	require.NoError(t, err, "failed to store user in test DB")
 
 	requestBodyValid, err := json.Marshal(AuthUserRequest{
 		Username: username,

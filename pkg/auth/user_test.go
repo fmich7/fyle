@@ -20,20 +20,15 @@ func TestNewUser(t *testing.T) {
 	assert.Greater(t, len(user.Password), 0, "Hashed password should not be empty")
 }
 
-func TestCheckPassword_Valid(t *testing.T) {
+func TestCheckPassword(t *testing.T) {
 	password := "securepassword"
 	user, err := NewUser("testuser", password)
 	require.NoError(t, err)
 
 	err = CheckPassword(user.Password, password)
 	assert.NoError(t, err, "Correct password should pass validation")
-}
 
-func TestCheckPassword_Invalid(t *testing.T) {
-	password := "securepassword"
-	user, err := NewUser("testuser", password)
-	require.NoError(t, err)
-
-	err = CheckPassword(user.Password, "wrongpassword")
+	wrongpassword := "adsfsafdfafdj"
+	err = CheckPassword(user.Password, wrongpassword)
 	assert.Error(t, err, "Incorrect password should fail validation")
 }

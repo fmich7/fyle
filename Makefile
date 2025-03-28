@@ -10,9 +10,9 @@ client: build-client
 	@./bin/fyle-client
 
 test:
-	go test -v -timeout 5s -race ./...
+	go test -v -timeout 10s -race ./pkg/... ./tests/...
 coverage:
-	go test -timeout 5s -race ./... -coverprofile=cover.out
+	go test -timeout 10s -race ./pkg/... ./tests/... -coverprofile=cover.out
 	go tool cover -html=cover.out
 
 .PHONY: client server

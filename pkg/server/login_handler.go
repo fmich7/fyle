@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -14,6 +15,7 @@ func (s *Server) LoginUser(username, password string) (*LoginResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("user %+v\n", usr)
 
 	// validate password
 	if err = auth.CheckPassword(usr.Password, password); err != nil {

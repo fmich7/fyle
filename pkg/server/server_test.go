@@ -18,8 +18,8 @@ func TestServerStart(t *testing.T) {
 	require.NoError(t, err)
 
 	srv := NewServer(cfg, store)
-
 	assert.False(t, srv.IsRunning(), "IsRunning should be false before start")
+
 	errCh := make(chan error, 1)
 	go func() {
 		errCh <- srv.Start()
@@ -40,6 +40,9 @@ func TestServerStart(t *testing.T) {
 	case err := <-errCh:
 		t.Fatalf("Failed to start server: %v", err)
 	}
+
+	// cleanup even if tests fail
+	t.Cleanup(func() { _ = srv.Shutdown() })
 
 	assert.True(t, srv.IsRunning(), "IsRunning should be true after start")
 
