@@ -21,6 +21,9 @@ func TestEncryptDecryptData(t *testing.T) {
 	_, err = io.Copy(&encryptedData, encryptedReader)
 	require.NoError(t, err, "Encryption failed")
 
+	// content must be different!
+	require.NotEqual(t, encryptedData.Bytes(), input, "Encrypted data should be different than plain")
+
 	decryptedReader := DecryptData(&encryptedData, encryptionKey)
 	var decryptedData bytes.Buffer
 	_, err = io.Copy(&decryptedData, decryptedReader)

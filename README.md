@@ -14,12 +14,12 @@
 
 ## 📖 Description
 
-_Fyle_ is a _file storage_ service written in **Go** that supports secure **file managment** with **AES-GCM** for **unique encryption**. It uses **JWT authentication** for user access and streams data in chunks to keep memory usage low. Sensitive data like credentials and encryption keys are safely stored in the **system's keyring**. Access the server through the **CLI client**. Application is tested with **unit and integration tests** with high codebase test coverage.
+_Fyle_ is a _file storage_ service written in **Go** that supports secure **file managment** with **AES-GCM** for **unique encryption**. It uses **JWT authentication** for user access and streams data in chunks to keep memory usage low. Sensitive data like credentials and encryption keys are safely stored in the **system's keyring**. Access the server through the **CLI client**. Application is tested with **unit and integration tests** ensuring high codebase test coverage.
 
 ## ✨ Features
 
-- **End-to-end encryption** Encrypt files with AES-GCM to keep user data secure and private
-- **Security** Different encryptions for each uploaded file
+- **End-to-end encryption** Encrypt files with AES-GCM to keep the data private and secure
+- **Security** Different encryption result for each uploaded file
 - **Keyring** Safely store sensitive data like credentials and encryption keys in the system's keyring
 - **Streaming files** Upload and download files in chunks to keep memory usage low
 - **JWT Authentication** Provides user authentication on the server
@@ -46,7 +46,7 @@ docker-compose up
 fyle signup [username] [password]
 ```
 
-> **[Optional]** Modify server configuration in `cmd/server/example_server.env`
+> **[Recommended]** Modify server configuration in `cmd/server/example_server.env`
 
 ## 📄 Usage
 
@@ -60,12 +60,6 @@ fyle login [username] [password]       # Login to the server
 
 > Run `fyle --help` to see all available commands and options.
 
-## 💡 Documentation
-
-Explore the full documentation for this package on
-
-> [pkg.go.dev/github.com/fmich7/fyle](https://pkg.go.dev/github.com/fmich7/fyle#section-documentation)
-
 ## 🛠️ Testing
 
 The application has been tested on the following platforms:
@@ -74,18 +68,32 @@ The application has been tested on the following platforms:
 - Windows 10
 - Go version 1.23.3
 
-To run end-to-end integration test that verifies the entire workflow:
+To run integration test that verifies the entire workflow:
 
 ```bash
-go test -v ./tests/integration_test.go
+go test -v -race ./tests/integration_test.go
 ```
 
 Run all tests:
 
 ```bash
-#	go test -v -timeout 10s -race ./pkg/... ./tests/...
+# go test -v -timeout 10s -race ./pkg/... ./tests/...
 make test
-# Generates test coverage file
-#	go test -timeout 10s -race ./pkg/... ./tests/... -coverprofile=cover.out
+```
+
+Generate test coverage file
+```bash
+# go test -timeout 10s -race ./pkg/... ./tests/... -coverprofile=cover.out
 make coverage
 ```
+Example tests:
+- [Integration test](https://github.com/fmich7/fyle/blob/main/tests/integration_test.go)
+- [Encryption stream test](https://github.com/fmich7/fyle/blob/main/pkg/crypto/encryption_test.go)
+- [JWT Auth test](https://github.com/fmich7/fyle/blob/main/pkg/auth/jwt_test.go)
+
+## 💡 Documentation
+
+Explore the full documentation for this package on
+
+> [pkg.go.dev/github.com/fmich7/fyle](https://pkg.go.dev/github.com/fmich7/fyle#section-documentation)
+
