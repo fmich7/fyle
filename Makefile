@@ -1,13 +1,16 @@
 build: build-client build-server
-build-client:
-	cd cmd/client && go build -o ../../bin/fyle-client
-build-server:
-	cd cmd/server && go build -o ../../bin/fyle-server
+
+build-client: 
+	go build -o ./bin/client ./cmd/fyle
+
+build-server: 
+	go build -o ./bin/server ./cmd/server
 
 server:
-	@cd cmd/server && go run main.go
-client: build-client
-	@./bin/fyle-client
+	@go run ./cmd/server/main.go --config=/home/fmich/projects/fyle/cmd/server/example_server.env
+
+install client: 
+	go install ./cmd/fyle
 
 test:
 	go test -v -timeout 10s -race ./pkg/... ./tests/...

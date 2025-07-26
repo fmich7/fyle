@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/fmich7/fyle/pkg/config"
@@ -10,8 +11,11 @@ import (
 )
 
 func main() {
+	configPath := flag.String("config", "", "Path to config file")
+	flag.Parse()
+
 	cfg := new(config.Config)
-	cfg.LoadConfig("cmd/server/example_server.env")
+	cfg.LoadConfig(*configPath)
 
 	// Setup user storage
 	userStorage, err := storage.NewPQUserStorage(cfg.PostgresCredentials)

@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["go", "run", "cmd/server/main.go"]
+CMD ["go", "run", "cmd/server/main.go", "--config=/app/cmd/server/example_server.env"]

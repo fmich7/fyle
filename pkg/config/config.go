@@ -17,13 +17,13 @@ type Config struct {
 }
 
 // LoadConfig loads config from .env file.
-func (c *Config) LoadConfig(fileName string) {
-	if fileName == "" {
-		fileName = ".env"
+func (c *Config) LoadConfig(configPath string) {
+	if configPath == "" {
+		log.Fatal("You must provide --config with the path to the config file")
 	}
 
 	// load config file
-	if err := godotenv.Load(fileName); err != nil {
+	if err := godotenv.Load(configPath); err != nil {
 		log.Println("No .env file found, using system environment variables")
 	}
 

@@ -1,5 +1,4 @@
-bin
 cover.out
-TODO.md
-test.txt
 uploads/*
+bin/client/**
+bin/server/**
