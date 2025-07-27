@@ -4,11 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"sort"
-	"strings"
 
 	"github.com/fmich7/fyle/pkg/auth"
 	"github.com/fmich7/fyle/pkg/config"
@@ -18,6 +13,7 @@ import (
 
 // PQUserStorage represents a user storage.
 type PQUserStorage struct {
+	Storage
 	db      *sql.DB
 	connStr string
 }
@@ -38,17 +34,10 @@ func NewPQUserStorage(c config.PostgresCredentials) (*PQUserStorage, error) {
 		return nil, fmt.Errorf("opening database %v", err)
 	}
 
-	log.Println("Connected to PostgreSQL!")
-
 	return &PQUserStorage{
 		db:      db,
 		connStr: connStr,
 	}, nil
-}
-
-// CloseDatabase closes the database connection.
-func (d *PQUserStorage) CloseDatabase() error {
-	return d.db.Close()
 }
 
 // StoreUser stores a user in the database.
@@ -104,41 +93,7 @@ func (d *PQUserStorage) RetrieveUser(username string) (*auth.User, error) {
 
 // RunMigrations runs all migrations in the given directory.
 func (d *PQUserStorage) RunMigrations(migrationsDir string) error {
-	log.Println("Starting migrations...")
-
-	// Read migrations files
-	files, err := os.ReadDir(migrationsDir)
-	if err != nil {
-		return err
-	}
-
-	// Get migration filenames
-	var migrationFiles []string
-	for _, file := range files {
-		if strings.HasSuffix(file.Name(), ".up.sql") {
-			migrationFiles = append(migrationFiles, file.Name())
-		}
-	}
-	sort.Strings(migrationFiles)
-
-	for _, file := range migrationFiles {
-		filePath := filepath.Join(migrationsDir, file)
-
-		sqlBytes, err := os.ReadFile(filePath)
-		if err != nil {
-			return err
-		}
-
-		sqlStatement := string(sqlBytes)
-
-		log.Println("Applying migration:", file)
-		_, err = d.db.Exec(sqlStatement)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return RunMigrations(d.db, migrationsDir, []string{"postgres", "users"})
 }
 
 func (d *PQUserStorage) Shutdown() error {

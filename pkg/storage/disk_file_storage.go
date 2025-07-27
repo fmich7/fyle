@@ -13,6 +13,7 @@ import (
 // DiskFileStorage is a struct that implements the Storage interface.
 // It is used to store files on disk.
 type DiskFileStorage struct {
+	Storage
 	fs       afero.Fs
 	location string
 }
@@ -85,6 +86,10 @@ func (d *DiskFileStorage) GetFileUploadsLocation() string {
 // GetUserFileTree returns string with user's files.
 func (d *DiskFileStorage) GetUserFileTree(path string) (string, error) {
 	return file.GetDirTree(d.fs, path)
+}
+
+func (d *DiskFileStorage) RunMigrations(migrationsDir string) error {
+	return nil
 }
 
 func (d *DiskFileStorage) Shutdown() error {

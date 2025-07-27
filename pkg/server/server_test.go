@@ -49,5 +49,5 @@ func TestServerStart(t *testing.T) {
 	port, err := srv.GetPort()
 	require.NoError(t, err, "Failed to get server port")
 	require.Greater(t, port, 0, "Invalid port assigned")
-	require.NoError(t, srv.Shutdown(), "Failed to shutdown server")
+	require.Empty(t, srv.Shutdown(), "Failed to shutdown server")
 }

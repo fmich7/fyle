@@ -14,13 +14,13 @@ import (
 type Server struct {
 	listenAddr   string
 	listener     atomic.Value
-	store        storage.Storage
+	store        *storage.ServerStorage
 	jwtSecretKey string
 	isRunning    atomic.Bool
 }
 
 // NewServer creates a new instance of the Server struct.
-func NewServer(cfg *config.Config, store storage.Storage) *Server {
+func NewServer(cfg *config.Config, store *storage.ServerStorage) *Server {
 	return &Server{
 		listenAddr:   cfg.ServerPort,
 		store:        store,
@@ -58,11 +58,12 @@ func (s *Server) Start() error {
 func (s *Server) Shutdown() error {
 	l := s.listener.Load()
 	if l != nil {
-		if err := l.(net.Listener).Close(); err != nil {
-			return fmt.Errorf("failed to close listener: %w", err)
+		if closeErr := l.(net.Listener).Close(); closeErr != nil {
+			return fmt.Errorf("failed to close listener: %w", closeErr)
 		}
 	}
-	return s.store.Shutdown()
+
+	return nil
 }
 
 // GetPort returns the actual port used by the server.

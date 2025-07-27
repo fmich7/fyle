@@ -15,5 +15,6 @@ func NewTestingStorage(fs afero.Fs) (*ServerStorage, error) {
 	return NewServerStorage(
 		fileStorage,
 		userStorage,
+		nil,
 	), nil
 }

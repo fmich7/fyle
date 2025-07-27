@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -9,12 +10,20 @@ import (
 
 // Config struct is a type that server is using for its configuration.
 type Config struct {
-	ServerPort          string
-	JWTsecretKey        string
-	UploadsLocation     string
-	MigrationPath       string
-	PostgresCredentials PostgresCredentials
+	ServerPort            string
+	JWTsecretKey          string
+	UploadsLocation       string
+	MigrationPath         string
+	MetadataPQCredentials PostgresCredentials
+	UserPQCredentials     PostgresCredentials
 }
+
+type PQStorage string
+
+const (
+	MetadataPQStorage PQStorage = "PQ_METADATADB"
+	UserPQStorage     PQStorage = "PQ_USERDB"
+)
 
 // LoadConfig loads config from .env file.
 func (c *Config) LoadConfig(configPath string) {
@@ -31,7 +40,8 @@ func (c *Config) LoadConfig(configPath string) {
 	c.JWTsecretKey = getEnv("SECRET_KEY", "als;dgasdfkasbf2ql4q")
 	c.UploadsLocation = getEnv("DISK_UPLOADS_LOCATION", "uploads")
 	c.MigrationPath = getEnv("MIGRATION_PATH", "migrations")
-	c.PostgresCredentials = getPostgresCredentials()
+	c.UserPQCredentials = getPostgresCredentials(UserPQStorage)
+	c.MetadataPQCredentials = getPostgresCredentials(MetadataPQStorage)
 }
 
 // getEnv set key value from env if exists, otherwise default value.
@@ -43,12 +53,12 @@ func getEnv(key, defaultValue string) string {
 }
 
 // getPostgresCredentials returns credentials that are used to connect to db.
-func getPostgresCredentials() PostgresCredentials {
+func getPostgresCredentials(dbName PQStorage) PostgresCredentials {
 	return PostgresCredentials{
-		DB_USER:     getEnv("POSTGRES_USER", "admin"),
-		DB_PASSWORD: getEnv("POSTGRES_PASSWORD", "root"),
-		DB_NAME:     getEnv("POSTGRES_NAME", "fyleDB"),
-		DB_HOST:     getEnv("POSTGRES_HOST", "postgres"),
-		DB_PORT:     getEnv("POSTGRES_PORT", "5432"),
+		DB_USER:     getEnv(fmt.Sprintf("%s_USER", dbName), "admin"),
+		DB_PASSWORD: getEnv(fmt.Sprintf("%s_PASSWORD", dbName), "root"),
+		DB_NAME:     getEnv(fmt.Sprintf("%s_NAME", dbName), "fyleDB"),
+		DB_HOST:     getEnv(fmt.Sprintf("%s_HOST", dbName), "postgres"),
+		DB_PORT:     getEnv(fmt.Sprintf("%s_PORT", dbName), "5432"),
 	}
 }

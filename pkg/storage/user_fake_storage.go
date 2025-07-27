@@ -8,6 +8,7 @@ import (
 
 // FakeUserDB simulates an memory user db.
 type FakeUserDB struct {
+	Storage
 	users map[string]auth.User
 }
 
@@ -46,7 +47,10 @@ func (f *FakeUserDB) RetrieveUser(username string) (*auth.User, error) {
 	}, nil
 }
 
-// Shutdown
 func (f *FakeUserDB) Shutdown() error {
+	return nil
+}
+
+func (f *FakeUserDB) RunMigrations(migrationsDir string) error {
 	return nil
 }
